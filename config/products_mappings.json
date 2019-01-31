@@ -15,36 +15,23 @@
         "category": {
           "properties": {
             "id": {"type": "integer"},
-            "parent": {
-              "properties": {
-                "id": {"type": "integer"},
-                "parent": {
-                  "properties": {
-                    "id": {"type": "integer"},
-                    "parent": {"type": "integer"},
-                    "title": {"type": "text", "fielddata": true},
-                    "group": {"type": "text", "fielddata": true}
-                  }
-                },
-                "title": {"type": "text", "fielddata": true},
-                "group": {"type": "text", "fielddata": true}
-              }
-            },
-            "title": {"type": "text", "fielddata": true},
-            "group": {"type": "text", "fielddata": true}
+            "parent": {"type": "object", "dynamic": true},
+            "title": {"type": "text", "fielddata": true}
           }
         },
         "thumbnail": {"type": "text"},
         "description": {"type": "text"},
         "price": {"type": "float"},
-        "site-url": {"type": "text"},
+        "site_url": {"type": "text", "fielddata": true},
         "created_by": {
           "properties": {
             "id": {"type": "integer"},
             "name": {"type": "text", "fielddata": true},
             "photo": {"type": "text"}
           }
-        }
+        },
+        "created_at": {"type": "date", "format": "yyyy-MM-dd HH:mm:ss", "null_value": "NULL"},
+        "updated_at": {"type": "date", "format": "yyyy-MM-dd HH:mm:ss", "null_value": "NULL"}
       }
     }
   }

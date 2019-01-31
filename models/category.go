@@ -19,6 +19,8 @@ type Category struct {
 }
 
 type CategoryNull struct {
+	Id		  sql.NullInt64
+	Title	  sql.NullString
 	ParentID  sql.NullInt64
 	CreatedAt mysql.NullTime
 	UpdatedAt mysql.NullTime

@@ -44,28 +44,28 @@ type ArticleNull struct {
 }
 
 type ArticleElastic struct {
-	ID					uint			`json:"id"`
-	Title				string			`json:"title"`
-	Slug                string      	`json:"slug"`
-	Permalink           string      	`json:"permalink"`
-	Content             string      	`json:"content"`
-	Image               string      	`json:"image"`
-	ImageSource         string      	`json:"image_source"`
-	SeoKeyword          string      	`json:"seo_keyword"`
-	Type                string      	`json:"type"`
-	Status              string      	`json:"status"`
-	RequestPublishDate  string   		`json:"request_publish_date,omitempty"`
-	PublishDate         string   		`json:"publish_date,omitempty"`
-	Writer              ArticleWriter   `json:"writer"`
-	Editor              ArticleWriter   `json:"editor"`
-	CreatedAt           string   		`json:"created_at"`
-	ContentManipulation string      	`json:"content_manipulation"`
-	Tags				[]Tags			`json:"tags"`
-	Categories			[]Categories	`json:"categories"`
-	Products			[]Products		`json:"products"`
+	ID					uint				`json:"id"`
+	Title				string				`json:"title"`
+	Slug                string      		`json:"slug"`
+	Permalink           string      		`json:"permalink"`
+	Content             string      		`json:"content"`
+	Image               string      		`json:"image"`
+	ImageSource         string      		`json:"image_source"`
+	SeoKeyword          string      		`json:"seo_keyword"`
+	Type                string      		`json:"type"`
+	Status              string      		`json:"status"`
+	RequestPublishDate  string   			`json:"request_publish_date,omitempty"`
+	PublishDate         string   			`json:"publish_date,omitempty"`
+	Writer              ArticleWriter   	`json:"writer"`
+	Editor              ArticleWriter   	`json:"editor"`
+	CreatedAt           string   			`json:"created_at"`
+	ContentManipulation string      		`json:"content_manipulation"`
+	Tags				[]ArticleTags		`json:"tags"`
+	Categories			[]ArticleCategories	`json:"categories"`
+	Products			[]ArticleProducts	`json:"products"`
 }
 
-type Tags struct {
+type ArticleTags struct {
 	ID		uint		`json:"id"`
 	Title	string		`json:"title"`
 }
@@ -76,12 +76,12 @@ type ArticleWriter struct {
 	Photo	string		`json:"photo"`
 }
 
-type Categories struct {
+type ArticleCategories struct {
 	ID		uint	`json:"id"`
 	Title	string	`json:"title"`
 }
 
-type Products struct {
+type ArticleProducts struct {
 	ID			uint	`json:"id"`
 	Name		string	`json:"name"`
 	Thumbnail	string	`json:"thumbnail"`

@@ -2,6 +2,7 @@ package models
 
 import (
 	"database/sql"
+	"encoding/json"
 	"github.com/go-sql-driver/mysql"
 	"time"
 )
@@ -30,6 +31,38 @@ type ProductNull struct {
 	UpdatedAt   mysql.NullTime
 	View		sql.NullInt64
 	Click		sql.NullInt64
+}
+
+type ProductElastic struct {
+	ID				uint				`json:"id"`
+	Name 			string				`json:"name"`
+
+	Brand 			struct {
+		ID 			uint				`json:"id"`
+		Name 		string				`json:"name"`
+	}									`json:"brand"`
+
+	Categories		ProductCategories	`json:"category"`
+
+	Thumbnail 		string				`json:"thumbnail"`
+	Description		string				`json:"description"`
+	Price 			float64				`json:"price"`
+	SiteURL			string				`json:"site_url"`
+
+	CreatedBy 		struct {
+		ID 	        uint				`json:"id"`
+		Name 		string				`json:"name"`
+		Photo		string				`json:"photo"`
+	}									`json:"created_by"`
+
+	CreatedAt 		string				`json:"created_at"`
+	UpdatedAt 		string				`json:"updated_at"`
+}
+
+type ProductCategories struct {
+	ID 			uint			`json:"id"`
+	Parent      json.RawMessage	`json:"parent"`
+	Title		string			`json:"title"`
 }
 
 type DescriptionProduct struct {

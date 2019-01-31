@@ -43,7 +43,7 @@ func BulkingAllDataFromSQL(tables map[string]string) (bool, error) {
 
 	if counter > 0 {
 		page := 1
-		limit := 100
+		limit := 200
 		nullStatus := false
 
 		for !nullStatus {
@@ -75,7 +75,27 @@ func BulkingAllDataFromSQL(tables map[string]string) (bool, error) {
 				}
 			case "products":
 				{
+					offset := page * limit -limit
+					tables["query"] = "  SELECT `products`.`id`,`products`.`name`, "+
+									  " `brands`.`id`,`brands`.`name`, "+
+									  " `categories`.`id`, "+
+									  " `products`.`thumbnail`,`products`.`description`,`products`.`price`,`products`.`site_url`, "+
+									  " `users`.`id`,`users`.`name`,`users`.`photo`, "+
+									  " `products`.`created_at`, `products`.`updated_at` "+
+									  "  FROM `products` "+
+									  "  LEFT JOIN `brands` ON `products`.`brand_id` = `brands`.`id` "+
+									  "  LEFT JOIN `categories` ON `categories`.`id` = `products`.`category_id` "+
+									  "  LEFT JOIN `users` ON `users`.`id` = `products`.`created_by` "+
+									  "  ORDER BY `products`.`id` ASC LIMIT " +strconv.Itoa(limit)+ " OFFSET " +strconv.Itoa(offset)
+					result, err := insertProductsBulking(db, tables)
+					page += 1
+					if !result {
+						if err!= nil {
+							nullStatus = true; return false, err
+						}
 
+						nullStatus = true
+					}
 				}
 			case "users":
 				{
@@ -328,9 +348,69 @@ func insertArticlesBulking(db *sql.DB, tables map[string]string) (bool, error) {
 	return true, nil
 }
 
+func insertProductsBulking(db *sql.DB, tables map[string]string) (bool, error) {
+	var indexed Indexing
+	var productsList string
+	var tglFormat = "2006-01-02 15:04:05"
+
+	rows, err := db.Query(tables["query"])
+	if err != nil {return false, err}
+
+	if !rows.Next() {return false, nil}
+
+	for rows.Next() {
+		var productElastic models.ProductElastic
+		var productNull models.ProductNull
+
+		err = rows.Scan(
+				&productElastic.ID,
+				&productElastic.Name,
+				&productElastic.Brand.ID,
+				&productElastic.Brand.Name,
+				&productElastic.Categories.ID,
+				&productElastic.Thumbnail,
+				&productNull.Description,
+				&productElastic.Price,
+				&productElastic.SiteURL,
+				&productElastic.CreatedBy.ID,
+				&productElastic.CreatedBy.Name,
+				&productElastic.CreatedBy.Photo,
+				&productNull.CreatedAt,
+				&productNull.UpdatedAt,
+			)
+
+		productElastic.Description = productNull.Description.String
+		productElastic.CreatedAt = productNull.CreatedAt.Time.Format(tglFormat)
+		productElastic.UpdatedAt = productNull.UpdatedAt.Time.Format(tglFormat)
+
+		productElastic.Categories, err = fetchNestedcategories(db, productElastic.Categories.ID)
+		if err!=nil {return false, err}
+
+		indexed.Index.ID    = strconv.Itoa(int(productElastic.ID))
+		indexed.Index.Index = config.GetString("database.elasticsearch.prefix") + tables["name"]
+		indexed.Index.Type  = tables["name"]
+
+		indexing, err := json.Marshal(indexed)
+		if err!=nil {return false, err}
+
+		products, err := json.Marshal(productElastic)
+		if err!=nil {return false, err}
+
+		productsList += string(indexing) + "\n"
+		productsList += string(products) + "\n"
+	}
+
+	if err = rows.Err(); err!=nil {return false, err}
+
+	result, err := insertDataBulking(productsList, tables["name"])
+	if err!=nil {return result, err}
+
+	return true, nil
+}
+
 func insertDataBulking(data string, table string) (bool, error) {
 	var responseBody map[string]interface{}
-	var url = "http://" + config.GetString("database.elasticsearch.url") +"/"+ config.GetString("database.elasticsearch.prefix") +table+ "/_bulk?pretty=true"
+	var url = config.GetString("database.elasticsearch.url") +"/"+ config.GetString("database.elasticsearch.prefix") +table+ "/_bulk?pretty=true"
 
 	request, err := http.NewRequest("POST", url, bytes.NewBuffer([]byte(data)))
 	if err != nil {
@@ -386,21 +466,21 @@ func insertDataBulking(data string, table string) (bool, error) {
 	return true, nil
 }
 
-func getTagsArticle(db *sql.DB, id uint) ([]models.Tags, error) {
-	var tags []models.Tags
+func getTagsArticle(db *sql.DB, id uint) ([]models.ArticleTags, error) {
+	var tags []models.ArticleTags
 	var sqlWord = " SELECT `tags`.`id`, `tags`.`title` FROM `articles_tags` "+
 				  " LEFT JOIN `tags` ON `articles_tags`.`tag_id` = `tags`.`id`" +
 				  " WHERE `articles_tags`.`article_id` = "
 
 	rows, err := db.Query(sqlWord +strconv.Itoa(int(id)))
 	if err != nil {
-		return []models.Tags{}, err
+		return []models.ArticleTags{}, err
 	}
 
 	defer rows.Close()
 
 	for rows.Next() {
-		var tag models.Tags
+		var tag models.ArticleTags
 
 		err = rows.Scan(
 				&tag.ID,
@@ -408,34 +488,34 @@ func getTagsArticle(db *sql.DB, id uint) ([]models.Tags, error) {
 			)
 
 		if err != nil {
-			return []models.Tags{}, err
+			return []models.ArticleTags{}, err
 		}
 
 		tags = append(tags, tag)
 	}
 
 	if err = rows.Err(); err != nil {
-		return []models.Tags{}, err
+		return []models.ArticleTags{}, err
 	}
 
 	return tags, nil
 }
 
-func getCategoriesArticle(db *sql.DB, id uint) ([]models.Categories, error) {
-	var categories []models.Categories
+func getCategoriesArticle(db *sql.DB, id uint) ([]models.ArticleCategories, error) {
+	var categories []models.ArticleCategories
 	var sqlWord = " SELECT `categories`.`id`, `categories`.`title` FROM `articles_categories` "+
 				  " LEFT JOIN `categories` ON `categories`.`id` = `articles_categories`.`category_id` "+
 				  " WHERE `articles_categories`.`article_id` = "
 
 	rows, err := db.Query(sqlWord +strconv.Itoa(int(id)))
 	if err != nil {
-		return []models.Categories{}, err
+		return []models.ArticleCategories{}, err
 	}
 
 	defer rows.Close()
 
 	for rows.Next() {
-		var category models.Categories
+		var category models.ArticleCategories
 
 		err := rows.Scan(
 				&category.ID,
@@ -443,21 +523,21 @@ func getCategoriesArticle(db *sql.DB, id uint) ([]models.Categories, error) {
 			)
 
 		if err != nil {
-			return []models.Categories{}, err
+			return []models.ArticleCategories{}, err
 		}
 
 		categories = append(categories, category)
 	}
 
 	if err = rows.Err(); err != nil {
-		return []models.Categories{}, err
+		return []models.ArticleCategories{}, err
 	}
 
 	return categories, nil
 }
 
-func getProductsArticle(db *sql.DB, id uint) ([]models.Products, error) {
-	var products []models.Products
+func getProductsArticle(db *sql.DB, id uint) ([]models.ArticleProducts, error) {
+	var products []models.ArticleProducts
 	var sqlWord = " SELECT `products`.`id`, `products`.`name`, `products`.`thumbnail`, `products`.`price`, `products`.`site_url`, `brands`.`id`, `brands`.`name` "+
 				  " FROM `articles_products` LEFT JOIN `products` ON `products`.`id` = `articles_products`.`product_id` "+
 				  " LEFT JOIN `brands` ON `brands`.`id` = `products`.`brand_id` "+
@@ -465,13 +545,13 @@ func getProductsArticle(db *sql.DB, id uint) ([]models.Products, error) {
 
 	rows, err := db.Query(sqlWord +strconv.Itoa(int(id)))
 	if err != nil {
-		return []models.Products{}, err
+		return []models.ArticleProducts{}, err
 	}
 
 	defer rows.Close()
 
 	for rows.Next() {
-		var product models.Products
+		var product models.ArticleProducts
 
 		err = rows.Scan(
 				&product.ID,
@@ -484,15 +564,92 @@ func getProductsArticle(db *sql.DB, id uint) ([]models.Products, error) {
 			)
 
 		if err != nil {
-			return []models.Products{}, err
+			return []models.ArticleProducts{}, err
 		}
 
 		products = append(products, product)
 	}
 
 	if err = rows.Err(); err != nil {
-		return []models.Products{}, err
+		return []models.ArticleProducts{}, err
 	}
 
 	return  products, nil
+}
+
+func fetchNestedcategories(db *sql.DB, id uint) (models.ProductCategories, error) {
+	var child 	models.ProductCategories
+	var parent1 models.ProductCategories
+	var parent2 models.ProductCategories
+
+	queries := "  SELECT categories.id AS cat_id,categories.title AS cat_title, " +
+			   "  childone.id AS child_one_id,childone.title AS child_one_title, " +
+			   "  parent.id AS parent_id,parent.title AS parent_title "+
+			   "  FROM categories "+
+			   "  LEFT JOIN categories AS `childone` ON childone.id = categories.parent_id "+
+			   "  LEFT JOIN categories AS `parent` ON parent.id = childone.parent_id "+
+			   "  WHERE categories.id = " +strconv.Itoa(int(id))
+
+	rows, err := db.Query(queries)
+	if err!=nil {return models.ProductCategories{}, err}
+
+	defer rows.Close()
+
+	for rows.Next() {
+		var childNull 	models.CategoryNull
+		var parent1Null models.CategoryNull
+		var parent2Null	models.CategoryNull
+
+		err = rows.Scan(
+				&childNull.Id,
+				&childNull.Title,
+				&parent1Null.Id,
+				&parent1Null.Title,
+				&parent2Null.Id,
+				&parent2Null.Title,
+			)
+
+		if err!=nil {return models.ProductCategories{}, err}
+
+		child.ID = uint(childNull.Id.Int64)
+		child.Title = childNull.Title.String
+		parent1.ID = uint(parent1Null.Id.Int64)
+		parent1.Title = parent1Null.Title.String
+		parent2.ID = uint(parent2Null.Id.Int64)
+		parent2.Title = parent2Null.Title.String
+	}
+
+	if parent2.ID == 0 {
+		parent1.Parent = nil
+		parent, err := json.Marshal(parent1)
+		if err!= nil {return models.ProductCategories{}, err}
+
+		parentChild := json.RawMessage(string(parent))
+		child.Parent = parentChild
+
+		return child, nil
+	}
+
+	if parent1.ID == 0 {
+		child.Parent = nil
+
+		return child, nil
+	}
+
+	if err = rows.Err(); err!=nil {return models.ProductCategories{}, err}
+
+	parent2.Parent = nil
+	parentnd, err := json.Marshal(parent2)
+	if err!=nil {return models.ProductCategories{}, err}
+
+	parent2nd := json.RawMessage(string(parentnd))
+	parent1.Parent = parent2nd
+
+	parentst, err := json.Marshal(parent1)
+	if err!=nil {return models.ProductCategories{}, err}
+
+	parent1st := json.RawMessage(string(parentst))
+	child.Parent = parent1st
+
+	return child, nil
 }

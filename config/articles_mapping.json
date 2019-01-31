@@ -18,17 +18,19 @@
         "writer": {
           "properties": {
             "id": {"type": "integer"},
-            "name": {"type": "text", "fielddata": true}
+            "name": {"type": "text", "fielddata": true},
+            "photo": {"type": "text"}
           }
         },
         "editor": {
           "properties": {
             "id": {"type": "integer"},
-            "name": {"type": "text", "fielddata": true}
+            "name": {"type": "text", "fielddata": true},
+            "photo": {"type": "text"}
           }
         },
         "created_at": {"type": "date", "format": "yyyy-MM-dd HH:mm:ss", "null_value": "NULL"},
-        "content_manulation": {"type": "text", "fielddata": true},
+        "content_manipulation": {"type": "text", "fielddata": true},
         "tags": {
           "properties": {
             "id": {"type": "integer"},
@@ -44,7 +46,16 @@
         "products": {
           "properties": {
             "id": {"type": "integer"},
-            "name": {"type": "text", "fielddata": true}
+            "name": {"type": "text", "fielddata": true},
+            "thumbnail": {"type": "text"},
+            "site_url": {"type": "text"},
+            "brand": {
+              "properties": {
+                "id": {"type": "integer"},
+                "name": {"type": "text", "fielddata": true}
+              }
+            },
+            "price": {"type": "float"}
           }
         }
       }

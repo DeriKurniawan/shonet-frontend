@@ -1,32 +1,28 @@
 {
   "mappings": {
     "users": {
-      "dynamic": "strict",
+      "dynamic": false,
       "properties": {
         "id": {"type": "integer"},
         "name": {"type": "text", "fielddata": true},
-        "password": {"type": "text"},
-        "remember_token": {"type": "text"},
+        "email": {"type": "text", "fielddata": true},
         "group": {
-          "dynamic": "strict",
           "properties": {
             "id": {"type": "integer"},
             "title": {"type": "text", "fielddata": true}
           }
         },
-        "is_active": {"type": "boolean"},
-        "is_reset_password": {"type": "boolean"},
+        "is_active": {"type": "integer"},
+        "is_reset_password": {"type": "integer"},
         "phone_number": {"type": "text"},
         "photo": {"type": "text"},
-        "biography": {"type": "text"},
+        "biography": {"type": "text", "fielddata": true},
         "birthdate": {"type": "date", "format": "yyyy-MM-dd HH:mm:ss", "null_value": "NULL"},
         "gender": {"type": "text", "fielddata": true},
         "city": {
-          "dynamic": "strict",
           "properties": {
             "id": {"type": "integer"},
             "country": {
-              "dynamic": "strict",
               "properties": {
                 "id": {"type": "integer"},
                 "name": {"type": "text", "fielddata": true},
