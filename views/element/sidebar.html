@@ -2,7 +2,7 @@
 <div class="sidebar-black init">
     <a href="/home" class="active">Home</a>
 
-    {{if (ne .Auth nil)}}
+    {{if (ne 0 .Data.Auth.ID)}}
     <a href="/profile">My Profile</a>
     {{else}}
     <a onclick="openModalLogin();">Sign In</a>
@@ -23,7 +23,7 @@
     <a href="/insiders">Insiders</a>
     <a href="/shop-list">Shop</a>
 
-    {{if (ne .Auth nil)}}
+    {{if (ne 0 .Data.Auth.ID)}}
     <a href='{{printf "%suser-logout" .Uri}}'>Log Out</a>
     {{end}}
     <div class="links">

@@ -12,6 +12,8 @@ import (
 type Page struct {
 	Title       string
 	Description string
+	Uri			string
+	Routing		string
 	Data        interface{}
 }
 
@@ -107,7 +109,6 @@ func GetMenu() (Menu, error) {
 		return Menu{}, err
 	}
 	menu.Journal.HotArticles = hotArticles
-
 
 	//set ton redis
 	data, err := json.Marshal(&menu)

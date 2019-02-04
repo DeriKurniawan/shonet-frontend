@@ -87,6 +87,7 @@ func BulkingAllDataFromSQL(tables map[string]string) (bool, error) {
 									  "  LEFT JOIN `categories` ON `categories`.`id` = `products`.`category_id` "+
 									  "  LEFT JOIN `users` ON `users`.`id` = `products`.`created_by` "+
 									  "  ORDER BY `products`.`id` ASC LIMIT " +strconv.Itoa(limit)+ " OFFSET " +strconv.Itoa(offset)
+
 					result, err := insertProductsBulking(db, tables)
 					page += 1
 					if !result {
@@ -461,7 +462,7 @@ func insertDataBulking(data string, table string) (bool, error) {
 		return false, err
 	}
 
-	response.Body.Close()
+	defer response.Body.Close()
 
 	return true, nil
 }

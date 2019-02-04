@@ -6,7 +6,7 @@
         <div class="modalogin-header">
             <span class="close-modalogin">&times;</span>
             <div style="display: flex; justify-content: center; width: 100%; height: 25px;">
-                <img src="{{ asset('/frontend/assets/the-shonet-logo-dark/the-shonet-logo-dark@2x.jpg') }}" alt="THE SHONET">
+                <img src="{{ printf "%sfrontend/assets/the-shonet-logo-dark/the-shonet-logo-dark@2x.jpg" .Uri }}" alt="THE SHONET">
             </div>
         </div>
         <div class="modalogin-body">
@@ -65,9 +65,9 @@
                 <div class="tab-content" id="pills-tabContent" style="margin: 30px 20px 20px 20px;">
                     <!--Log In-->
                     <div class="tab-pane modalogin-content-show" id="pills-login">
-                        <form action="{{ route('user.login') }}" method="post">
-                            {{ csrf_field() }}
-                            @if(session()->has('errors'))
+                        <form action="{{ printf "%susers/login" .Uri }}" method="post">
+
+                            {{/* @if(session()->has('errors'))
                             <input class="input-tag" id="username" name="email" type="text" placeholder="Username" value="{{ session()->get('email') }}">
                             <input class="input-tag" id="password-login" name="password" type="password" placeholder="Password" style="border: 1px solid red;">
                             @else
@@ -77,7 +77,8 @@
 
                             @if(session()->has('errors'))
                             <em class="label-grey" style="color: red;font-size: 11px;">Your account do not match with our data</em>
-                            @endif
+                            @endif */}}
+
                             <div class="container-space-between" style="margin-bottom: 17px;">
                                 <div>
                                     <input id="remember-me-login" type="checkbox">

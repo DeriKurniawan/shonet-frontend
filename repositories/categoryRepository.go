@@ -6,7 +6,7 @@ import (
 )
 
 func GetCategoryForMenu(query []string) ([]models.Category, error) {
-	sqlWords :=  " SELECT * FROM `categories` WHERE " +query[0]+ " = " +query[1]+ " ORDER BY `categories`.`title` ASC"
+	sqlWords :=  " SELECT * FROM `categories` WHERE `categories`.`" +query[0]+ "` = '" +query[1]+ "' ORDER BY `categories`.`title` ASC"
 
 	return fetchCategories(db.Query(sqlWords))
 }
@@ -26,7 +26,7 @@ func fetchCategories(rows *sql.Rows, err error) ([]models.Category, error) {
 
 		err = rows.Scan(
 				&category.ID,
-				&category.ParentID,
+				&categoryNull.ParentID,
 				&category.Group,
 				&category.Title,
 				&categoryNull.CreatedAt,
@@ -41,6 +41,7 @@ func fetchCategories(rows *sql.Rows, err error) ([]models.Category, error) {
 		category.CreatedAt = categoryNull.CreatedAt.Time
 		category.UpdatedAt = categoryNull.UpdatedAt.Time
 		category.Icon	   = categoryNull.Icon.String
+		category.ParentID  = uint(categoryNull.ParentID.Int64)
 
 		categories = append(categories, category)
 	}

@@ -4,6 +4,7 @@ import (
 	"database/sql"
 	"github.com/jacky-htg/shonet-frontend/libraries"
 	"github.com/jacky-htg/shonet-frontend/models"
+	"strconv"
 	"strings"
 )
 
@@ -43,7 +44,7 @@ func GetHotArticles() (HotArticlesMenu, error) {
 				 	" SELECT * FROM `articles` WHERE `hot_articles`.`article_id` = `articles`.`id` AND (" +
 				 	" `articles`.`status` = 'P' AND `articles`.`publish_date` <= NOW() " +
 				 	" )" +
-				 	" ) ORDER BY `hot_articles`.`id` DESC LIMIT " + string(limitOrder)
+				 	" ) ORDER BY `hot_articles`.`id` DESC LIMIT " + strconv.Itoa(limitOrder)
 
 
 	hotArticles, err := fetchHotArticles(db.Query(hotArticleSql))
@@ -55,17 +56,17 @@ func GetHotArticles() (HotArticlesMenu, error) {
 		result.HotArticles = hotArticles
 
 		for _, val := range hotArticles {
-			whereNotIn = append(whereNotIn, string(val.ID))
+			whereNotIn = append(whereNotIn, strconv.Itoa(int(val.ID)))
 		}
 
 		curLimit += len(hotArticles)
+	} else {
+		whereNotIn = append(whereNotIn, strconv.Itoa(0))
 	}
 
 	articleSql   := " SELECT * FROM `articles` WHERE `articles`.`id` NOT IN (" +
 					  strings.Join(whereNotIn, ", ")+
-					" ) LIMIT " +
-					  (string(limitOrder - curLimit))+
-					" ORDER BY `articles`.`trending_count`, `articles`.`publish_date` DESC"
+					" ) ORDER BY `articles`.`trending_count`, `articles`.`publish_date` DESC LIMIT " +(strconv.Itoa(limitOrder - curLimit))
 
 	if curLimit < limitOrder {
 		articles, err := fetchArticles(db.Query(articleSql))

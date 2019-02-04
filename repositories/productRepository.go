@@ -3,6 +3,7 @@ package repositories
 import (
 	"database/sql"
 	"github.com/jacky-htg/shonet-frontend/models"
+	"strconv"
 	"strings"
 )
 
@@ -12,9 +13,9 @@ func GetTopProduct(flag uint) (TopProductMenu, error) {
 	var curLimit = 0
 	var whereNotIn = []string{}
 
-	sqlWords := " SELECT * FROM `products` WHERE `products`.`top_product` != 0 AND `products.category_id` IN ( " +
-		   		" SELECT * FROM `categories` WHERE `categories`.`parent_id` = " +string(flag)+
-		   		" ) ORDER BY `products`.`name` DESC LIMIT " +string(oriLimit)
+	sqlWords := " SELECT * FROM `products` WHERE `products`.`top_product` != 0 AND `products`.`category_id` IN ( " +
+		   		" SELECT `categories`.`id` FROM `categories` WHERE `categories`.`parent_id` = " +strconv.Itoa(int(flag))+
+		   		" ) ORDER BY `products`.`name` DESC LIMIT " +strconv.Itoa(oriLimit)
 
 	products, err := fetchProducts(db.Query(sqlWords))
 	if err != nil {
@@ -23,16 +24,18 @@ func GetTopProduct(flag uint) (TopProductMenu, error) {
 
 	if len(products) > 0 {
 		result.Top = products
-		for _, val := range products {whereNotIn = append(whereNotIn, string(val.ID))}
+		for _, val := range products {whereNotIn = append(whereNotIn, strconv.Itoa(int(val.ID)))}
 		curLimit += len(products)
+	} else {
+		whereNotIn = append(whereNotIn, strconv.Itoa(0))
 	}
 
 	if curLimit < oriLimit {
 		sqlWords = " SELECT * FROM `products` WHERE `products`.`id` NOT IN ( " +
 				   " " +strings.Join(whereNotIn, ", ")+ " ) " +
 				   " AND `products`.`category_id` IN ( " +
-				   " SELECT `id` FROM `categories` WHERE `categories`.`parent_id` = " +string(flag)+
-				   " ) ORDER BY `products`.`view`, `products`.`id` DESC  LIMIT " +string(oriLimit - curLimit)
+				   " SELECT `id` FROM `categories` WHERE `categories`.`parent_id` = " +strconv.Itoa(int(flag))+
+				   " ) ORDER BY `products`.`view`, `products`.`id` DESC  LIMIT " +strconv.Itoa(oriLimit - curLimit)
 
 		products, err = fetchProducts(db.Query(sqlWords))
 		if err != nil {
@@ -69,6 +72,7 @@ func fetchProducts(rows *sql.Rows, err error) ([]models.Product, error) {
 				&product.SiteURL,
 				&product.MustHave,
 				&product.TopProduct,
+				&product.CreatedBy,
 				&productNull.CreatedAt,
 				&productNull.UpdatedAt,
 				&productNull.View,
@@ -79,11 +83,11 @@ func fetchProducts(rows *sql.Rows, err error) ([]models.Product, error) {
 			return []models.Product{}, err
 		}
 
-		product.Description = productNull.Description.String
-		product.CreatedAt = productNull.CreatedAt.Time
-		product.UpdatedAt = productNull.UpdatedAt.Time
-		product.View = int(productNull.View.Int64)
-		product.Click = int(productNull.Click.Int64)
+		product.Description 	= productNull.Description.String
+		product.CreatedAt 		= productNull.CreatedAt.Time
+		product.UpdatedAt 		= productNull.UpdatedAt.Time
+		product.View 			= int(productNull.View.Int64)
+		product.Click 			= int(productNull.Click.Int64)
 
 		products = append(products, product)
 	}

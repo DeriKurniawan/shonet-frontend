@@ -54,13 +54,13 @@
                                                 <div class="col-sm-4">
                                                     <ul>
                                                         <li>
-                                                            {{if (eq .Auth nil)}}
+                                                            {{if (eq 0 .Data.Auth.ID)}}
                                                             <div class="dropdown logout">
 
                                                                 <a href="/profile" id="login-button" class="dropdown-toggle" id="dropdownMenuLink" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                                                                    <img class="user-profile-img" src='{{printf "%s" .Auth.Photo}}' onerror="this.src='/frontend/images/blog/img-def.svg';" alt="user-profile-img">
+                                                                    <img class="user-profile-img" src='{{printf "%s" .Data.Auth.Photo}}' onerror="this.src='/frontend/images/blog/img-def.svg';" alt="user-profile-img">
                                                                     <span style="white-space: nowrap; max-width: 100px; overflow: hidden; text-overflow: ellipsis; display: inline-block; position: relative; line-height: 10px">
-																			{{.Auth.Name}}
+																			{{.Data.Auth.Name}}
                                                                     </span>
                                                                 </a>
                                                                 <div class="dropdown-menu" aria-labelledby="dropdownMenuLink">

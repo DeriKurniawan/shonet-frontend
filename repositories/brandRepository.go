@@ -3,6 +3,7 @@ package repositories
 import (
 	"database/sql"
 	"github.com/jacky-htg/shonet-frontend/models"
+	"strconv"
 	"strings"
 )
 
@@ -14,7 +15,7 @@ func GetTopBrands(flag int) ([]models.Brand, error) {
 	var whereNotIn []string
 
 	if flag == 2 {brandFlag = "beauty_brand"}
-	sql = "SELECT * FROM `brands` WHERE " +brandFlag+ " = " +string(flag)+ " LIMIT " +string(oriLimit)+ " ORDER BY `brands`.`name` ASC"
+	sql = "SELECT * FROM `brands` WHERE " +brandFlag+ " = " +strconv.Itoa(flag)+ " ORDER BY `brands`.`name` ASC LIMIT " +strconv.Itoa(oriLimit)
 
 	brands, err := fetchBrands(db.Query(sql))
 	if err != nil {
@@ -26,11 +27,13 @@ func GetTopBrands(flag int) ([]models.Brand, error) {
 	}
 
 	if curLimit < oriLimit {
-		whereProduct := []string{"`products`.`category_id` IN (SELECT `categories`.`id` FROM `categories` WHERE `categories`.`parent_id` = " +string(flag)+ " )"}
+		whereProduct := []string{"`products`.`category_id` IN (SELECT `categories`.`id` FROM `categories` WHERE `categories`.`parent_id` = " +strconv.Itoa(flag)+ " )"}
 
 		if len(brands) > 0 {
-			for _, val := range brands {whereNotIn = append(whereNotIn, string(val.ID))}
+			for _, val := range brands {whereNotIn = append(whereNotIn, strconv.Itoa(int(val.ID)))}
 			whereProduct = append(whereProduct, "`products`.`brand_id` NOT IN (" +strings.Join(whereNotIn, ", ")+ ")")
+		} else {
+			whereNotIn = append(whereNotIn, strconv.Itoa(0))
 		}
 
 		sql  = " SELECT ViewProduct.brand_id FROM (SELECT products.id, COUNT(products.id) N, products.brand_id FROM log_view_products " +
@@ -40,7 +43,7 @@ func GetTopBrands(flag int) ([]models.Brand, error) {
 
 		//------
 		//take current brands from current brands
-		sql = " SELECT * FROM `brands` WHERE `brands`.`id` NOT IN ( " +strings.Join(whereNotIn, ", ")+ " ) LIMIT " +string(oriLimit - curLimit)+ " ORDER BY `brands`.`name` ASC"
+		sql = " SELECT * FROM `brands` WHERE `brands`.`id` NOT IN ( " +strings.Join(whereNotIn, ", ")+ " ) ORDER BY `brands`.`name` ASC LIMIT " +strconv.Itoa(oriLimit - curLimit)
 		brands1, err := fetchBrands(db.Query(sql))
 		if err != nil {
 			return []models.Brand{}, err
@@ -85,16 +88,16 @@ func fetchBrands(rows *sql.Rows, err error) ([]models.Brand, error) {
 			return []models.Brand{}, err
 		}
 
-		brand.Description = brandNull.Description.String
-		brand.Image = brandNull.Image.String
-		brand.SiteURL = brandNull.SiteURL.String
-		brand.BeautyBrand = uint(brandNull.BeautyBrand.Int64)
-		brand.FashionBrand = uint(brandNull.BeautyBrand.Int64)
-		brand.DeliveryNote = brandNull.DeliveryNote.String
-		brand.SocialMedia = brandNull.SocialMedia.String
-		brand.ReturnNote = brandNull.VendorTitle.String
-		brand.CreatedAt = brandNull.CreatedAt.Time
-		brand.UpdatedAt = brandNull.UpdatedAt.Time
+		brand.Description 	= brandNull.Description.String
+		brand.Image 		= brandNull.Image.String
+		brand.SiteURL 		= brandNull.SiteURL.String
+		brand.BeautyBrand 	= uint(brandNull.BeautyBrand.Int64)
+		brand.FashionBrand 	= uint(brandNull.BeautyBrand.Int64)
+		brand.DeliveryNote	= brandNull.DeliveryNote.String
+		brand.SocialMedia 	= brandNull.SocialMedia.String
+		brand.ReturnNote 	= brandNull.VendorTitle.String
+		brand.CreatedAt 	= brandNull.CreatedAt.Time
+		brand.UpdatedAt 	= brandNull.UpdatedAt.Time
 
 		brands = append(brands, brand)
 	}
@@ -103,5 +106,5 @@ func fetchBrands(rows *sql.Rows, err error) ([]models.Brand, error) {
 		return []models.Brand{}, err
 	}
 
-	return []models.Brand{}, nil
+	return brands, nil
 }

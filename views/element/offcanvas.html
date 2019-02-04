@@ -45,7 +45,7 @@
                     <a href='{{printf "%sshop-list" .Uri}}'>Shop</a>
                 </li>
 
-                {{if (eq .Auth nil)}}
+                {{if (eq 0 .Data.Auth.ID)}}
                 <li>
                     <a id="user-login-open">Log In</a>
                 </li>

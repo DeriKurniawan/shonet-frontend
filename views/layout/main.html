@@ -12,8 +12,8 @@
     <style>iframe{position:relative !important; min-height: 450px;}</style>
 
     <link href='{{ printf "%sfrontend/images/fav.png" .Uri }}' rel="shortcut icon">
-    <link href='{{ printf "%s/%s" .Uri .Route }}' rel="canonical">
-    <link href='{{  printf "%sfrontend/css/font-awesome.min.css" .uri }}' media='all' rel='stylesheet' type='text/css'>
+    <link href='{{ printf "%s/%s" .Uri .Routing }}' rel="canonical">
+    <link href='{{  printf "%sfrontend/css/font-awesome.min.css" .Uri }}' media='all' rel='stylesheet' type='text/css'>
 
     <link href='{{  printf "%sfrontend/css/style.css" .Uri }}' media='all' rel='stylesheet' type='text/css'>
     <link href='{{ printf "%sfrontend/css/create-jurnal.css" .Uri }}' media="all" rel="stylesheet" type="text/css">
@@ -23,18 +23,16 @@
     <link href='{{  printf "%sfrontend/owl/owl.carousel.css" .Uri }}' media='all' rel='stylesheet' type='text/css'>
     <link href='{{  printf "%sfrontend/owl/owl.theme.css" .Uri }}' media='all' rel='stylesheet' type='text/css'>
     <link href='{{  printf "%sfrontend/owl/owl.transitions.css" .Uri }}' media='all' rel='stylesheet' type='text/css'>
-    {{- /* <link href="{{ printf "%sfrontend/css/user-profile.css" .Uri }}" media="all" rel="stylesheet" type="text/css"> */ -}}
-    <!--link href='{{-  /* printf "%sfrontend/css/commerce.css" .Uri */ -}} media='all' rel='stylesheet' type='text/css'>
-    <link href='{{  printf "%sfrontend/css/custom.css" .Uri }} media='all' rel='stylesheet' type='text/css'>
-    <link href='{{  printf "%sfrontend/css/elegant-icon.css" .Uri }} media='all' rel='stylesheet' type='text/css'>
+    <link href='{{  printf "%sfrontend/css/custom.css" .Uri }}' media='all' rel='stylesheet' type='text/css'>
+    <link href='{{  printf "%sfrontend/css/elegant-icon.css" .Uri }}' media='all' rel='stylesheet' type='text/css'>
     <link href='{{  printf "%sfrontend/css/jquery.selectBox.css" .Uri }}' media='all' rel='stylesheet' type='text/css'>
-    <link href='{{  printf "%sfrontend/css/login.css" .Uri }} media='all' rel='stylesheet' type='text/css'>
-    <link href='{{  printf "%sfrontend/css/preloader.css" .Uri }} media='all' rel='stylesheet' type='text/css'>
-    <link href='{{  printf "%sfrontend/css/prettyPhoto.css" .Uri }} media='all' rel='stylesheet' type='text/css'>
-    <link href='{{  printf "%sfrontend/css/select2-register.css" .Uri }} media='all' rel='stylesheet' type='text/css'>
-    <link href='{{  printf "%sfrontend/css/settings.css" .Uri }} media='all' rel='stylesheet' type='text/css'>
-    <link href='{{  printf "%sfrontend/css/user-profile.css" .Uri }} media='all' rel='stylesheet' type='text/css'-->
-    <!--link href='{{  printf "%sfrontend/css/bootstrap.min.css" .Uri }} media='all' rel='stylesheet' type='text/css'-->
+    <link href='{{  printf "%sfrontend/css/login.css" .Uri }}' media='all' rel='stylesheet' type='text/css'>
+    <link href='{{  printf "%sfrontend/css/preloader.css" .Uri }}' media='all' rel='stylesheet' type='text/css'>
+    <link href='{{  printf "%sfrontend/css/prettyPhoto.css" .Uri }}' media='all' rel='stylesheet' type='text/css'>
+    <link href='{{  printf "%sfrontend/css/select2-register.css" .Uri }}' media='all' rel='stylesheet' type='text/css'>
+    <link href='{{  printf "%sfrontend/css/settings.css" .Uri }}' media='all' rel='stylesheet' type='text/css'>
+    <link href='{{  printf "%sfrontend/css/user-profile.css" .Uri }}' media='all' rel='stylesheet' type='text/css'-->
+    <!--link href='{{  printf "%sfrontend/css/bootstrap.min.css" .Uri }}' media='all' rel='stylesheet' type='text/css'-->
     <!--link href="{{  printf "%sfrontend/plugins/datetimepick/dist/jquery" .Uri }}.datetimepicker.min.css" rel="stylesheet" type="text/css"-->
     <link href='https://fonts.googleapis.com/css?family=Lato%3A400%2C700%2C900&#038;ver=4.3.1' media='all' rel='stylesheet' type='text/css'>
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
@@ -99,7 +97,7 @@
         var OneSignal = window.OneSignal || [];
         OneSignal.push(function() {
             OneSignal.init({
-                appId: '{{printf "%s" .onesignalID}}',
+                appId: '{{printf "%s" .Data.OnesignalID}}',
                 autoRegister: true,
                 notifyButton: {
                     enable: false,
@@ -109,8 +107,8 @@
                 }
             });
 
-            {{if (ne .Auth.User.ID 0)}}
-            OneSignal.setEmail('{{printf "%s" .Auth.Email}}');
+            {{if (ne .Data.Auth.ID 0)}}
+            OneSignal.setEmail('{{printf "%s" .Data.Auth.Email}}');
             {{end}}
         });
     </script>
@@ -129,12 +127,12 @@
             t.src=v;s=b.getElementsByTagName(e)[0];s.parentNode.insertBefore(t,s)}(window,
             document,'script','https://connect.facebook.net/en_US/fbevents.js');
         // Insert Your Facebook Pixel ID below.
-        fbq('init', '{{printf "%s" .PixelID}}');
+        fbq('init', '{{printf "%s" .Data.PixelID}}');
         fbq('track', 'PageView');
     </script>
     <!-- Insert Your Facebook Pixel ID below. -->
     <noscript><img height="1" width="1" style="display:none"
-                   src='https://www.facebook.com/tr?id={{printf "%s" .PixelID}}&amp;ev=PageView&amp;noscript=1'
+                   src='https://www.facebook.com/tr?id={{printf "%s" .Data.PixelID}}&amp;ev=PageView&amp;noscript=1'
         /></noscript>
     <!-- End Facebook Pixel Code -->
 
@@ -176,13 +174,13 @@
     {{ template "header" . }}
     {{ template "content" . }}
 
-    {{ template "modal-login" . }}
+    {{/*{{ template "modal-login" . }}*/}}
 
     <script src='{{ printf "%sfrontend/js/jquery-1.11.3.min.js" .Uri }}' type='text/javascript'></script>
     <script src='{{  printf "%sfrontend/js/jquery-migrate.min.js" .Uri }}' type='text/javascript'></script>
-    {{- /*<script src='{{  printf "%sfrontend/js/jquery.themepunch.tools.min.js" .Uri }} type='text/javascript'></script>
-    <script src='{{  printf "%sfrontend/js/jquery.themepunch.revolution.min.js" .Uri }} type='text/javascript'></script> */-}}
-    {{- /* <script src='{{  printf "%sfrontend/js/easing.min.js" }} type='text/javascript'></script>  */-}}
+    {{/* <script src='{{  printf "%sfrontend/js/jquery.themepunch.tools.min.js" .Uri }}' type='text/javascript'></script> */}}
+    {{/* <script src='{{  printf "%sfrontend/js/jquery.themepunch.revolution.min.js" .Uri }}' type='text/javascript'></script> */}}
+    {{- /* <script src='{{  printf "%sfrontend/js/easing.min.js" }}' type='text/javascript'></script>  */ -}}
     <script src='{{  printf "%sfrontend/js/imagesloaded.pkgd.min.js" .Uri }}' type='text/javascript'></script>
     <script src='{{  printf "%sfrontend/js/bootstrap.min.js" .Uri }}' type='text/javascript'></script>
     <script src='{{  printf "%sfrontend/js/superfish-1.7.4.min.js" .Uri }}' type='text/javascript'></script>
@@ -193,8 +191,8 @@
     <script src='{{  printf "%sfrontend/js/jquery.prettyPhoto.init.min.js" .Uri }} type='text/javascript'></script> */ -}}
     <script src='{{  printf "%sfrontend/js/jquery.selectBox.min.js" .Uri }}' type='text/javascript'></script>
     <script src='{{  printf "%sfrontend/js/jquery.touchSwipe.min.js" .Uri }}' type='text/javascript'></script>
-    <script src='{{  printf "%sfrontend/js/jquery.transit.min.js". Uri }}' type='text/javascript'></script>
-    <!-- <script src='{{  printf "%sfrontend/js/jquery.carouFredSel.min.js" .Uri }} type='text/javascript'></script> -->
+    <script src='{{  printf "%sfrontend/js/jquery.transit.min.js" .Uri }}' type='text/javascript'></script>
+    <!-- <script src='{{  printf "%sfrontend/js/jquery.carouFredSel.min.js" .Uri }}' type='text/javascript'></script> -->
     <script src='{{  printf "%sfrontend/js/owl.carousel.min.js" .Uri }}' type='text/javascript'></script>
     {{- /* <script src='{{  printf "%sfrontend/js/jquery.countdown.min.js" .Uri }} type='text/javascript'></script> */ -}}
     <script src="{{  printf "%sfrontend/js/isotope.pkgd.min.js" .Uri }}" type='text/javascript'></script>
@@ -205,7 +203,7 @@
     <script src='{{  printf "%sfrontend/owl/owl.carousel.min.js" .Uri }}' type='text/javascript'></script>
 
     <script>
-        var base_url              = "{{secure_url('/')}}";
+        var base_url              = "{{ printf "%s" .Uri }}";
 
         $(document).ready(function(){
             $('._token').val($('meta[name=csrf-token]').attr("content"));
@@ -219,7 +217,7 @@
             var js, fjs = d.getElementsByTagName(s)[0];
             if (d.getElementById(id)) return;
             js = d.createElement(s); js.id = id;
-            js.src = "https://connect.facebook.net/id_ID/sdk.js#xfbml=1&version=v2.11&appId={{ printf '%s' .Facebook.AppID }}";
+            js.src = "https://connect.facebook.net/id_ID/sdk.js#xfbml=1&version=v2.11&appId={{ printf "%v" .Facebook.AppID }}";
             fjs.parentNode.insertBefore(js, fjs);
         }(document, 'script', 'facebook-jssdk'));
         {{end}}
@@ -262,7 +260,7 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.6-rc.0/js/select2.min.js"></script>
     <script src='{{  printf "%sfrontend/js/register.js" .Uri}}' type='text/javascript'></script>
     <script>
-        var base_url = "{{ secure_url('/') }}";
+        var base_url = "{{ printf "%s" .Uri }}";
 
         function showForgotPass (page) {
             if (page === 'forgot') {
@@ -286,7 +284,7 @@
                 type: "POST",
                 url : base_url+"/send-mail/password/reset",
                 data : {
-                    _token : "{{ csrf_token() }}",
+                    _token : "",
                     email : $('input[id="reset-password"]').val()
                 },
                 beforeSend: function () {
@@ -331,7 +329,7 @@
                 type: "POST",
                 url : base_url+"/send-mail/password/reset",
                 data : {
-                    _token : "{{ csrf_token() }}",
+                    _token : "",
                     email : $('input[id="reset-error-password"]').val()
                 },
                 beforeSend: function () {
@@ -365,9 +363,9 @@
                 })
         });
 
-        @if(\Route::currentRouteName() === 'home')
+        {{- /*@if(\Route::currentRouteName() === 'home')
         $('#user-login-modal').show();
-        @endif
+        @endif*/ -}}
 
         $(document).on('click', "#login-button", function(){
             $('#user-login-modal').show();
@@ -461,12 +459,12 @@
                 });
         });
 
-        @php isset($resetingPassword) ? $resetingPassword : $resetingPassword = false; @endphp
-        @if($resetingPassword)
+        {{/* @php isset($resetingPassword) ? $resetingPassword : $resetingPassword = false; @endphp */}}
+        {{/* @if($resetingPassword)
 
         $('#password-confirm-forgot').on('keyup', function () {
             var emailInput = $('input[name="username-forgot-input"]').val();
-            var emailConfirm = "{{ isset($emailForResetPassword) ?  $emailForResetPassword :  '' }}";
+            var emailConfirm = "";
             var passwordNew = $('input[name="password-new"]').val();
             var confirmPassText = $(this).val();
 
@@ -530,21 +528,22 @@
             }
         })
 
-        @endif
+        @endif */}}
     </script>
     {{end}}
 
-    @section('footer_scripts') @show
+    {{/*@section('footer_scripts') @show*/}}
 
+    {{template "footer-scripts" .}}
     <!-- Global site tag (gtag.js) - Google Analytics -->
-    <script async src="https://www.googletagmanager.com/gtag/js?id={{config('services.google.analytics.id')}}"></script>
+    <script async src="https://www.googletagmanager.com/gtag/js?id="></script>
 
     <script>
         window.dataLayer = window.dataLayer || [];
         function gtag(){dataLayer.push(arguments);}
         gtag('js', new Date());
 
-        gtag('config', '{{config("services.google.analytics.id")}}');
+        gtag('config', '{{ printf "%s" .Data.GoogleID }}');
     </script>
 
     <!-- Hotjar Tracking Code for theshonet.com -->
