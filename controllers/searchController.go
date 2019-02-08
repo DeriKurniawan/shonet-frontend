@@ -4,6 +4,7 @@ import (
 	"github.com/jacky-htg/shonet-frontend/config"
 	"github.com/jacky-htg/shonet-frontend/libraries"
 	"html/template"
+	"log"
 	_ "log"
 	"net/http"
 	"net/url"
@@ -17,6 +18,7 @@ type DataSearchPage struct {
 	GoogleID 	string
 	OnesignalID string
 	PixelID		string
+	BaseURL		template.URL
 }
 
 func SearchIndexHandler(w http.ResponseWriter, r *http.Request) {
@@ -42,6 +44,7 @@ func SearchIndexHandler(w http.ResponseWriter, r *http.Request) {
 			GoogleID:		config.GetString("services.google.analytics.id"),
 			OnesignalID:	config.GetString("services.onesignal.app.id"),
 			PixelID:		config.GetString("services.facebook.pixel.id"),
+			BaseURL:		template.URL(config.GetString("app.url")),
 		},
 	}
 
@@ -50,10 +53,13 @@ func SearchIndexHandler(w http.ResponseWriter, r *http.Request) {
 			return strings.ToUpper(words)
 		},
 		"urlencode": func(words string) string {
-			result, _ := url.Parse(words)
+			result, err := url.Parse(words)
+			if err!=nil {log.Printf("ERROR: <urlencode> - ", err.Error()); return words}
+
 			return result.EscapedPath()
 		},
 		"number_format": func(number float64, decimals uint, point, separator string) string {
+
 			return libraries.NumberFormat(number, decimals, point, separator)
 		},
 	}).ParseFiles(

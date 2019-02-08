@@ -8,6 +8,7 @@ import (
 	"github.com/jacky-htg/shonet-frontend/config"
 	"github.com/jacky-htg/shonet-frontend/models"
 	"io/ioutil"
+	"log"
 	"net/http"
 	"reflect"
 	"strconv"
@@ -43,7 +44,7 @@ func BulkingAllDataFromSQL(tables map[string]string) (bool, error) {
 
 	if counter > 0 {
 		page := 1
-		limit := 200
+		limit := 250
 		nullStatus := false
 
 		for !nullStatus {
@@ -60,7 +61,7 @@ func BulkingAllDataFromSQL(tables map[string]string) (bool, error) {
 									  "  FROM `articles` "+
 									  "  LEFT JOIN `users` AS `writer` ON `writer`.`id` = `articles`.`writer` "+
 									  "  LEFT JOIN `users` AS `editor` ON `editor`.`id` = `articles`.`editor` "+
-									  "  WHERE `articles`.`status` = 'P' AND (`articles`.`publish_date` IS NOT NULL AND `articles`.`publish_date` <= NOW()) "+
+									  "  WHERE `articles`.`status` = 'P' AND `articles`.`publish_date` IS NOT NULL "+
 									  "  ORDER BY `articles`.`id` DESC LIMIT " +strconv.Itoa(limit)+ " OFFSET " +strconv.Itoa(offset)
 
 					result, err := insertArticlesBulking(db, tables)
@@ -653,4 +654,66 @@ func fetchNestedcategories(db *sql.DB, id uint) (models.ProductCategories, error
 	child.Parent = parent1st
 
 	return child, nil
+}
+
+func InsertElasticMapping(prefixname string) (bool, error) {
+	var prefix = strings.Split(prefixname, ":")[0]
+	var name = strings.Split(prefixname, ":")[1]
+
+	filemap, err := ioutil.ReadFile("./config/"+name+".json")
+	if err !=nil {panic(err); return false, err}
+
+	var url = config.GetString("database.elasticsearch.url") +"/"+ config.GetString("database.elasticsearch.prefix") +prefix+ "?pretty=true"
+
+	request, err := http.NewRequest("PUT", url, bytes.NewBuffer(filemap))
+	if err !=nil {panic(err); return false, err}
+
+	request.Header.Set("Content-Type", "application/json")
+
+	client := &http.Client{}
+	response, err := client.Do(request)
+	if err !=nil {panic(err); return false, err}
+
+	jsresponse, err := ioutil.ReadAll(response.Body)
+	if err !=nil {panic(err); return false, err}
+
+	log.Println("\n" + string(jsresponse))
+
+	return true, nil
+}
+
+func DeleteElastic(prefix string) (bool) {
+	var url = config.GetString("database.elasticsearch.url") +"/"+ config.GetString("database.elasticsearch.prefix") +prefix+ "?pretty=true"
+
+	request, err := http.NewRequest("DELETE", url, nil)
+	if err !=nil {panic(err); return false}
+
+	client := &http.Client{}
+	response, err := client.Do(request)
+	if err !=nil {panic(err); return false}
+
+	jsresponse, err := ioutil.ReadAll(response.Body)
+	if err !=nil {panic(err); return false}
+
+	log.Println("\n" + string(jsresponse))
+
+	return true
+}
+
+func CheckExistElastic(prefix string) (bool) {
+	var url = config.GetString("database.elasticsearch.url") +"/"+ config.GetString("database.elasticsearch.prefix") +prefix+ "/_mapping?pretty=true"
+
+	request, err := http.NewRequest("GET", url, nil)
+	if err !=nil {panic(err); return false}
+
+	client := &http.Client{}
+	response, err := client.Do(request)
+	if err !=nil {panic(err); return false}
+
+	jsresponse, err := ioutil.ReadAll(response.Body)
+	if err !=nil {panic(err); return false}
+
+	log.Println("\n" + string(jsresponse))
+
+	return true
 }

@@ -1,10 +1,63 @@
 {
+  "settings": {
+    "index": {
+      "analysis": {
+        "filter": {},
+
+        "analyzer": {
+          "keyword_analyzer": {
+            "filter": ["lowercase", "asciifolding", "trim"],
+            "char_filter": [],
+            "type": "custom",
+            "tokenizer": "keyword"
+          },
+
+          "edge_ngram_analyzer": {
+            "filter": ["lowercase"],
+            "tokenizer": "edge_ngram_tokenizer"
+          },
+
+          "edge_ngram_search_analyzer": {
+            "tokenizer": "lowercase"
+          }
+        },
+
+        "tokenizer": {
+          "edge_ngram_tokenizer": {
+            "type": "edge_ngram",
+            "min_gram": 2,
+            "max-gram": 5,
+            "token_chars": ["letter"]
+          }
+        }
+      }
+    }
+  },
+
   "mappings": {
     "articles": {
       "dynamic": "strict",
       "properties": {
         "id": {"type": "integer"},
-        "title": {"type": "text", "fielddata": true},
+        "title": {
+          "type": "text",
+          "fielddata": true,
+          "fields": {
+            "keywordstring": {
+              "type": "text",
+              "analyzer": "keyword_analyzer"
+            },
+            "edgengram": {
+              "type": "text",
+              "analyzer": "edge_ngram_analyzer",
+              "search_analyzer": "edge_ngram_search_analyzer"
+            },
+            "completion": {
+              "type": "completion"
+            }
+          }
+        },
+
         "slug": {"type": "text", "fielddata": true},
         "permalink": {"type": "text"},
         "content": {"type": "text", "fielddata": true},
@@ -15,6 +68,7 @@
         "status": {"type": "text", "fielddata": true},
         "request_publish_date": {"type": "date", "format": "yyyy-MM-dd HH:mm:ss", "null_value": "NULL"},
         "publish_date": {"type": "date", "format": "yyyy-MM-dd HH:mm:ss", "null_value": "NULL"},
+
         "writer": {
           "properties": {
             "id": {"type": "integer"},
@@ -22,6 +76,7 @@
             "photo": {"type": "text"}
           }
         },
+
         "editor": {
           "properties": {
             "id": {"type": "integer"},
@@ -29,6 +84,7 @@
             "photo": {"type": "text"}
           }
         },
+
         "created_at": {"type": "date", "format": "yyyy-MM-dd HH:mm:ss", "null_value": "NULL"},
         "content_manipulation": {"type": "text", "fielddata": true},
         "tags": {
@@ -37,12 +93,14 @@
             "title": {"type": "text", "fielddata": true}
           }
         },
+
         "categories": {
           "properties": {
             "id": {"type": "integer"},
             "title": {"type": "text", "fielddata": true}
           }
         },
+
         "products": {
           "properties": {
             "id": {"type": "integer"},

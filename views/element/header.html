@@ -54,7 +54,7 @@
                                                 <div class="col-sm-4">
                                                     <ul>
                                                         <li>
-                                                            {{if (eq 0 .Data.Auth.ID)}}
+                                                            {{if (ne 0 .Data.Auth.ID)}}
                                                             <div class="dropdown logout">
 
                                                                 <a href="/profile" id="login-button" class="dropdown-toggle" id="dropdownMenuLink" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">

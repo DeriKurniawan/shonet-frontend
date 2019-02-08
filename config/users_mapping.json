@@ -1,10 +1,62 @@
 {
+  "settings": {
+    "index": {
+      "analysis": {
+        "filter": {},
+
+        "analyzer": {
+          "keyword_analyzer": {
+            "filter": ["lowercase", "asciifolding", "trim"],
+            "char_filter": [],
+            "type": "custom",
+            "tokenizer": "keyword"
+          },
+
+          "edge_ngram_analyzer": {
+            "filter": ["lowercase"],
+            "tokenizer": "edge_ngram_tokenizer"
+          },
+
+          "edge_ngram_search_analyzer": {
+            "tokenizer": "lowercase"
+          }
+        },
+
+        "tokenizer": {
+          "edge_ngram_tokenizer": {
+            "type": "edge_ngram",
+            "min_gram": 2,
+            "max-gram": 5,
+            "token_chars": ["letter"]
+          }
+        }
+      }
+    }
+  },
+
   "mappings": {
     "users": {
       "dynamic": false,
       "properties": {
         "id": {"type": "integer"},
-        "name": {"type": "text", "fielddata": true},
+        "name": {
+          "type": "text",
+          "fielddata": true,
+          "fields": {
+            "keywordstring": {
+              "type": "text",
+              "analyzer": "keyword_analyzer"
+            },
+            "edgengram": {
+              "type": "text",
+              "analyzer": "edge_ngram_analyzer",
+              "search_analyzer": "edge_ngram_search_analyzer"
+            },
+            "completion": {
+              "type": "completion"
+            }
+          }
+        },
         "email": {"type": "text", "fielddata": true},
         "group": {
           "properties": {

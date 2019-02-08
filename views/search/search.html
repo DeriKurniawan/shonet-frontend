@@ -1,7 +1,15 @@
 {{define "inner-style"}}
-    <style>
+    <link rel='stylesheet' href='https://code.jquery.com/ui/1.11.4/themes/smoothness/jquery-ui.css'>
+    <link href="{{printf "%sfrontend/css/jquery.selectBox.css" .Uri}}" media='all' rel='stylesheet' type='text/css'>
+    <link href="{{printf "%sfrontend/css/searching.css" .Uri}}" media='all' rel='stylesheet' type='text/css'/>
+    <link href="{{printf "%sfrontend/css/commerce.css" .Uri}}" media='all' rel='stylesheet' type='text/css'/>
 
-    </style>
+    <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
+    <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
+    <!--[if lt IE 9]>
+    <script src="https://oss.maxcdn.com/html5shiv/3.7.2/html5shiv.min.js"></script>
+    <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
+    <![endif]-->
 {{end}}
 
 {{define "content"}}
@@ -244,7 +252,169 @@
 {{end}}
 
 {{define "footer-scripts"}}
-    <script>
+    <script src='{{printf "%sfrontend/js/jquery.themepunch.tools.min.js" .Uri}}' type='text/javascript'></script>
+    <script src='{{printf "%sfrontend/js/jquery.themepunch.revolution.min.js" .Uri}}' type='text/javascript'></script>
+    <script src='{{printf "%sfrontend/js/easing.min.js" .Uri}}' type='text/javascript'></script>
+    <script src='{{printf "%sfrontend/js/imagesloaded.pkgd.min.js" .Uri}}' type='text/javascript'></script>
+    <script src='{{printf "%sfrontend/js/jquery.appear.min.js" .Uri}}' type='text/javascript'></script>
+    <script src='{{printf "%sfrontend/js/script.js" .Uri}}' type='text/javascript'></script>
+    <script src='{{printf "%sfrontend/js/jquery.prettyPhoto.js" .Uri}}' type='text/javascript'></script>
+    <script src='{{printf "%sfrontend/js/jquery.prettyPhoto.init.min.js" .Uri}}' type='text/javascript'></script>
+    <script src='{{printf "%sfrontend/js/jquery.carouFredSel.min.js" .Uri}}' type='text/javascript'></script>
+    <script src='{{printf "%sfrontend/js/jquery.countdown.min.js" .Uri}}' type='text/javascript'></script>
+    <script src='{{printf "%sfrontend/js/preloader.min.js" .Uri}}' type='text/javascript'></script>
 
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/ScrollMagic/2.0.6/ScrollMagic.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/ScrollMagic/2.0.6/plugins/debug.addIndicators.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.3/js/select2.js"></script>
+
+    <script type="text/javascript">
+        $(document).ready(function () {
+            enableScroll();
+
+            //
+            $('#edit-profile').click(function () {
+                $('input.heading-input').removeAttr('disabled');
+            });
+
+            $(function () {
+                $('[data-toggle="tooltip"]').tooltip();
+            });
+
+            // tab menu
+            $('.navigation-box-follow').hide();
+            $('a.content-header-title').click(function(){
+                $('.targetTab').hide();
+                $('#tab'+$(this).attr('target')).show();
+                $('a.content-header-title').removeClass('active');
+                $(this).addClass('active');
+                $('.navigation-box-follow').show();
+                $('.see-more').hide();
+            });
+            $('.see-more a').click(function(){
+                $('.targetTab').hide();
+                $('#tab'+$(this).attr('target')).show();
+                $('a.content-header-title').removeClass('active');
+                $('.navigation-box-follow').show();
+                $('.see-more').hide();
+            });
+            $('#allpost').click(function(){
+                $('#tab1.targetTab, #tab2.targetTab, #tab3.targetTab').show();
+                $('.navigation-box-follow').hide();
+                $('.see-more').show();
+            });
+
+            // auto complete jquery
+            $.widget( "custom.catcomplete", $.ui.autocomplete, {
+                _create: function() {
+                    this._super();
+                    this.widget().menu( "option", "items", "> :not(.ui-autocomplete-category)" );
+                },
+                _renderMenu: function( ul, items ) {
+                    var that = this,
+                        currentCategory = "";
+                    $.each( items, function( index, item ) {
+                        var li;
+                        if ( item.category != currentCategory ) {
+                            ul.append( "<li class='ui-autocomplete-category'>" + item.category + "</li>" );
+                            currentCategory = item.category;
+                        }
+                        li = that._renderItemData( ul, item );
+                        if ( item.category ) {
+                            li.attr( "aria-label", item.category + " : " + item.label );
+                        }
+                    });
+                }
+            });
+
+
+            // Actual Code
+            $(function() {
+                var data = [
+                    { label: "zara", category: "" },
+                    { label: "zara in post", category: "" },
+                    { label: "zara in insiders", category: "" },
+                    { label: "zara in products", category: "" },
+                    { label: "zara", category: "Products" },
+                    { label: "zara", category: "Products" },
+                    { label: "zara", category: "Products" },
+                    { label: "zara", category: "Insiders" },
+                    { label: "zara", category: "Insiders" },
+                    { label: "zara", category: "Insiders" },
+                    { label: "zara", category: "Post" },
+                    { label: "zara", category: "Post" },
+                    { label: "zara", category: "Post" }
+                ];
+
+                $( "#search" ).catcomplete({
+                    delay: 0,
+                    source: data
+                });
+            });
+        });
+    </script>
+
+    <script type="text/javascript">
+        $( document ).ready(function() {
+            var $stickyads = $('.stickyads');
+            var $owlprev = $('.owl-prev');
+            var $owlnext = $('.owl-next');
+
+            var stickyadsTop = $stickyads.offset().top;
+
+            $(window).scroll(function(){
+                var windowTop = $(window).scrollTop();
+                var windowWidth = window.innerWidth;
+                if ( stickyTop < windowTop ) {
+                    $owlprev.css({ visibility: 'hidden' });
+                    $owlnext.css({ visibility: 'hidden' });
+                    if ( windowWidth >= 1200 ) {
+                        $sticky.css({ position: 'fixed', top: 40, marginLeft: '0%', transition: 'top 0.6s', backgroundColor: '#F5F5F5', width: 618, paddingTop: 20, paddingBottom: 10, paddingLeft: 3});
+                    } else if ( windowWidth >= 992 && windowWidth <= 1199 ) {
+                        $sticky.css({ position: 'fixed', top: 40, marginLeft: '0%', transition: 'top 0.6s', backgroundColor: '#F5F5F5', width: 493.7, paddingTop: 20, paddingBottom: 10, paddingLeft: 3});
+                    }	else if ( windowWidth >= 600 && windowWidth <= 991 ) {
+                        $sticky.css({ position: 'fixed', top: -30, marginLeft: '0%', transition: 'top 0.6s', backgroundColor: '#F5F5F5', width: '97%', paddingTop: 20, paddingBottom: 10, paddingLeft: 3});
+                    } else if ( windowWidth >= 421 && windowWidth <= 599) {
+                        $sticky.css({ position: 'fixed', top: -30, marginLeft: '0%', transition: 'top 0.6s', backgroundColor: '#F5F5F5', width: '95%', paddingTop: 20, paddingBottom: 10, paddingLeft: 3});
+                    } else {
+                        $sticky.css({ position: 'fixed', top: -30, marginLeft: '0%', transition: 'top 0.6s', backgroundColor: '#F5F5F5', width: '100%', paddingTop: 20, paddingBottom: 10, paddingLeft: 3});
+                    }
+                } else {
+                    $stickyads.css({ position: 'relative', top: 0});
+                    $sticky.css({position: 'relative', top: -5, paddingTop: 0, paddingBottom: 0, border: '0'});
+                    $owlprev.css({ visibility: 'visible' });
+                    $owlnext.css({ visibility: 'visible' });
+                };
+                if ( stickyadsTop < windowTop ) {
+                    if ( windowWidth >= 1200 ) {
+                        $stickyads.css({ position: 'fixed', top: 90, transition: 'top 0.6s', width: 246});
+                    } else if ( windowWidth >= 992 && windowWidth <= 1199 ) {
+                        $stickyads.css({ position: 'fixed', top: 90, transition: 'top 0.6s', width: 193});
+                    } else {
+                    }
+                } else {
+                    $stickyads.css({ position: 'relative', top: 0});
+                };
+            });
+
+
+            var scrollbarTimeout;
+            $('.sidebar').scroll(function() {
+                $('.sidebar').show();
+                clearTimeout(scrollbarTimeout);
+                scrollbarTimeout = setTimeout(function()
+                {
+                    // Your function here
+                    $('#navScrollbar').hide();
+                }, 500);
+            });
+
+        });
+    </script>
+
+    <script>
+        $('.burger').click(function(){
+            $('.sidebar').toggleClass("show");
+        });
     </script>
 {{end}}
