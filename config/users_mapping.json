@@ -26,7 +26,7 @@
           "edge_ngram_tokenizer": {
             "type": "edge_ngram",
             "min_gram": 2,
-            "max-gram": 5,
+            "max_gram": 5,
             "token_chars": ["letter"]
           }
         }
@@ -55,7 +55,8 @@
             "completion": {
               "type": "completion"
             }
-          }
+          },
+          "analyzer": "standard"
         },
         "email": {"type": "text", "fielddata": true},
         "group": {
