@@ -1,6 +1,7 @@
 package main
 
 import (
+	"github.com/gorilla/handlers"
 	"log"
 	"net/http"
 
@@ -10,8 +11,11 @@ import (
 
 func main() {
 	router := routing.NewRouter()
-	err := http.ListenAndServe(config.GetString("server.address"), router)
+	allowedHeaders  := handlers.AllowedHeaders([]string{"*"})
+	allowedOrigins  := handlers.AllowedOrigins([]string{"*"})
+	allowedMethods  := handlers.AllowedMethods([]string{"GET", "HEAD", "POST", "PUT", "DELETE", "OPTIONS"})
 
+	err := http.ListenAndServe(config.GetString("server.address"), handlers.CORS(allowedHeaders, allowedOrigins, allowedMethods)(router))
 	if err != nil {
 		log.Fatal("ListenAndServe: ", err)
 	}

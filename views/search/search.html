@@ -348,10 +348,53 @@
 
                 $( "#search" ).catcomplete({
                     delay: 0,
-                    source: data
+                    source: function (req, resp) {
+                        console.log("{{printf "%s/elastic/search?word=" .Data.ApiUrl.url}}" + req.term);
+                        $.ajax({
+                            type: 'GET',
+                            url: "{{printf "%s/elastic/search?word=" .Data.ApiUrl.url}}" + req.term,
+                            headers: {
+                                "Content-Type": "application/json",
+                                "Access-Control-Allow-Headers": 'x-requested-with',
+                                "Access-Control-Allow-Methods": 'GET, POST, OPTIONS',
+                                "Access-Control-Allow-Credentials": 'true',
+                                "Access-Control-Allow-Origin": "*",
+                                "Access-Control-Max-Age": 86400,
+                                "X-Api-Key"   : "{{printf "%s" .Data.ApiUrl.apiKey}}"
+                            },
+                            crossDomain: true,
+                        }).done(function(data) {
+                            resp($.map(data, function (el) {
+                                return {
+                                    label: el.label,
+                                    category: el.category,
+                                    id: el.id
+                                }
+                            }))
+                        })
+                    }
                 });
             });
         });
+
+        var test = function() {
+            fetch("https://apidev.theshonet.com/elastic/search?word=zara", {
+                credentials: 'same-origin',
+                method     : 'GET',
+                headers    : new Headers({
+                    'Content-Type'    : 'application/json',
+                    'Accept'          : 'application/json',
+                    'X-Requested-With': 'XMLHttpRequest',
+                    'X-Api-Key': 'sh0N3tAp13L45t1cD3v'
+                })
+            }).then(resp => resp.json())
+                .then(resp => {
+                    console.log(resp);
+                })
+                .catch(err => console.log(err))
+        }
+
+        test();
     </script>
 
     <script type="text/javascript">

@@ -19,6 +19,10 @@ type DataSearchPage struct {
 	OnesignalID string
 	PixelID		string
 	BaseURL		template.URL
+	ApiUrl		interface{}
+	Articles  []interface{}
+	Products  []interface{}
+	Users     []interface{}
 }
 
 func SearchIndexHandler(w http.ResponseWriter, r *http.Request) {
@@ -33,6 +37,12 @@ func SearchIndexHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	var api map[string]interface{}
+	api = map[string]interface{}{
+		"apiKey": config.GetString("elasticsearch.apiKey"),
+		"url"   : config.GetString("elasticsearch.url"),
+	}
+
 	data := Page{
 		Title:			"THE SHONET | search ",
 		Description:	"searching all products, articles and branch ",
@@ -45,6 +55,7 @@ func SearchIndexHandler(w http.ResponseWriter, r *http.Request) {
 			OnesignalID:	config.GetString("services.onesignal.app.id"),
 			PixelID:		config.GetString("services.facebook.pixel.id"),
 			BaseURL:		template.URL(config.GetString("app.url")),
+			ApiUrl:			api,
 		},
 	}
 
