@@ -1,9 +1,13 @@
 package controllers
 
 import (
+	"encoding/json"
+	"fmt"
 	"github.com/jacky-htg/shonet-frontend/config"
 	"github.com/jacky-htg/shonet-frontend/libraries"
+	"github.com/jacky-htg/shonet-frontend/repositories"
 	"html/template"
+	"io/ioutil"
 	"log"
 	_ "log"
 	"net/http"
@@ -18,12 +22,19 @@ type DataSearchPage struct {
 	GoogleID 	string
 	OnesignalID string
 	PixelID		string
+	Word		string
 	BaseURL		template.URL
 	ApiUrl		interface{}
 	Articles  []interface{}
 	Products  []interface{}
 	Users     []interface{}
+	Banner      interface{}
 }
+
+var errx     error
+var users    []interface{}
+var products []interface{}
+var articles []interface{}
 
 func SearchIndexHandler(w http.ResponseWriter, r *http.Request) {
 
@@ -38,10 +49,29 @@ func SearchIndexHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	var api map[string]interface{}
+	var word string
+
 	api = map[string]interface{}{
 		"apiKey": config.GetString("elasticsearch.apiKey"),
 		"url"   : config.GetString("elasticsearch.url"),
 	}
+
+	err = r.ParseForm()
+	if libraries.CheckError(err) {return}
+
+	word = r.FormValue("search")
+
+	GetUsersDataSearch(r)
+	if libraries.CheckError(errx) {return}
+
+	GetProductsDataSearch(r)
+	if libraries.CheckError(errx) {return}
+
+	GetArticlesDataSearch(r)
+	if libraries.CheckError(errx) {return}
+
+	banner, err := repositories.GetBannerForFront()
+	if libraries.CheckError(err) {return}
 
 	data := Page{
 		Title:			"THE SHONET | search ",
@@ -55,9 +85,16 @@ func SearchIndexHandler(w http.ResponseWriter, r *http.Request) {
 			OnesignalID:	config.GetString("services.onesignal.app.id"),
 			PixelID:		config.GetString("services.facebook.pixel.id"),
 			BaseURL:		template.URL(config.GetString("app.url")),
+			Word:			word,
 			ApiUrl:			api,
+			Users:          users,
+			Products:       products,
+			Articles:		articles,
+			Banner:         banner,
 		},
 	}
+
+	fmt.Println(banner)
 
 	tmpl := template.Must(template.New("main.html").Funcs(template.FuncMap{
 		"strtoupper": func(words string) string {
@@ -86,4 +123,91 @@ func SearchIndexHandler(w http.ResponseWriter, r *http.Request) {
 
 	err = tmpl.Execute(w, data)
 	if libraries.CheckError(err) {return}
+}
+
+func GetUsersDataSearch(r *http.Request) {
+	err := r.ParseForm()
+	if err!=nil {errx = err;return}
+
+	result, err := url.Parse(r.FormValue("search"))
+	if err!=nil {errx = err;return}
+
+	urlx := config.GetString("elasticsearch.url") +
+		   "/elastic/search/users?word=" +
+		   result.EscapedPath()
+
+	request, err := http.NewRequest("GET", urlx, nil)
+	if err!=nil {errx = err;return}
+
+	request.Header.Set("X-Api-Key", config.GetString("elasticsearch.apiKey"))
+
+	client := http.Client{}
+	response, err := client.Do(request)
+	if err!=nil {errx = err;return}
+
+	defer response.Body.Close()
+
+	body, err := ioutil.ReadAll(response.Body)
+	if err!=nil {errx=err;return}
+
+	err = json.Unmarshal(body, &users)
+	if err!=nil {errx=err;return}
+}
+
+func GetProductsDataSearch(r *http.Request) {
+	err := r.ParseForm()
+	if err!=nil {errx=err;return}
+
+	result, err := url.Parse(r.FormValue("search"))
+	if err !=nil {errx=err;return}
+
+	urlx := config.GetString("elasticsearch.url") +
+		    "/elastic/search/products?word=" +
+			result.EscapedPath()
+
+	request, err := http.NewRequest("GET", urlx, nil)
+	if err!=nil {errx=err;return}
+
+	request.Header.Set("X-Api-Key", config.GetString("elasticsearch.apiKey"))
+
+	client := http.Client{}
+	response, err := client.Do(request)
+	if err!=nil {errx=err;return}
+
+	defer response.Body.Close()
+
+	body, err := ioutil.ReadAll(response.Body)
+	if err!=nil {errx=err;return}
+
+	err = json.Unmarshal(body, &products)
+	if err!=nil {errx=err;return}
+}
+
+func GetArticlesDataSearch(r *http.Request) {
+	err := r.ParseForm()
+	if err!=nil {errx=err;return}
+
+	result, err := url.Parse(r.FormValue("search"))
+	if err !=nil {errx=err;return}
+
+	urlx := config.GetString("elasticsearch.url") +
+		    "/elastic/search/articles?word=" +
+		    result.EscapedPath()
+
+	request, err := http.NewRequest("GET", urlx, nil)
+	if err!=nil {errx=err;return}
+
+	request.Header.Set("X-Api-Key", config.GetString("elasticsearch.apiKey"))
+
+	client := http.Client{}
+	response, err := client.Do(request)
+	if err!=nil {errx=err;return}
+
+	defer response.Body.Close()
+
+	body, err := ioutil.ReadAll(response.Body)
+	if err!=nil {errx=err;return}
+
+	err = json.Unmarshal(body, &articles)
+	if err!=nil {errx=err;return}
 }

@@ -92,21 +92,23 @@
                         <h5 class="heading-filter">Post</h5>
 
                         {{/*post result card mulai*/}}
+                        {{range .Data.Articles}}
                         <div class="wrap-new-post-search">
                             <a class="search-post-img" href="#">
-                                <img class="img-responsive" src="{{printf "%s" .Uri}}assets/bitmap.jpg">
+                                <img class="img-responsive" src="{{printf "%s" .image_source}}">
                             </a>
                             <div class="content-post-search">
-                                <a href="#">3 Langkah Mudah Ini Kulitmu Akan Selalu Sehat Terawat, Girls!</a>
+                                <a href="#">{{ printf "%s" .title }}</a>
                                 <div class="article-profile">
-                                    <img class="article-post-img-search" src="{{printf "%s" .Uri}}assets/avatar.png" alt="user-profile-img">
+                                    <img class="article-post-img-search" src="{{printf "%s" .writer.photo}}" alt="user-profile-img">
                                     <div class="article-post-content">
-                                        <p class="article-name">Rayoga Akbar Firdaus</p>
-                                        <p class="article-title"><span>Jakarta</span> Indonesia</p>
+                                        <p class="article-name">{{ .writer.name }}</p>
+                                        <!-- p class="article-title"></p -->
                                     </div>
                                 </div>
                             </div>
                         </div>
+                        {{end}}
                         {{/*post result card selesai*/}}
 
                         {{/*navigation mulai*/}}
@@ -115,7 +117,7 @@
                                 <a target="1">See More</a>
                             </div>
                             <div class="navigation-box-follow">
-                                <div class="pagination">
+                                <!-- div class="pagination">
                                     <a href="#"><i class="fa fa-arrow-left"></i></a>
                                     <a href="#">1</a>
                                     <a class="active" href="#">2</a>
@@ -125,7 +127,7 @@
                                     <a href="#">...</a>
                                     <a href="#">8</a>
                                     <a href="#"><i class="fa fa-arrow-right"></i></a>
-                                </div>
+                                </div -->
                             </div>
                         </div>
                         {{/*navigation selesai*/}}
@@ -141,15 +143,17 @@
                         <h5 class="heading-filter">Insider</h5>
 
                         {{/*Follower insider search*/}}
+                        {{range .Data.Users}}
                         <div class="col-md-4 col-sm-6 col-xs-6">
                             <a href="">
                                 <div class="wrap-box-follow">
-                                    <img class="following-row-mid-big" src="assets/avatar-2.jpeg" alt="following-feed-img">
-                                    <span class="heading-box-follow">Adhytia Putra</span>
+                                    <img class="following-row-mid-big" src="{{printf "%s" .photo}}" alt="following-feed-img">
+                                    <span class="heading-box-follow">{{ .name }}</span>
                                     <a class="btn-box-followed" href="#">Follow +</a>
                                 </div>
                             </a>
                         </div>
+                        {{end}}
                         {{/*Follower insider search selesai*/}}
 
                         {{/*pagination mulai*/}}
@@ -158,7 +162,7 @@
                                 <a target="2">See More</a>
                             </div>
                             <div class="navigation-box-follow">
-                                <div class="pagination">
+                                <!-- div class="pagination">
                                     <a href="#"><i class="fa fa-arrow-left"></i></a>
                                     <a href="#">1</a>
                                     <a class="active" href="#">2</a>
@@ -168,7 +172,7 @@
                                     <a href="#">...</a>
                                     <a href="#">8</a>
                                     <a href="#"><i class="fa fa-arrow-right"></i></a>
-                                </div>
+                                </div -->
                             </div>
                         </div>
                         {{/*pagination selesai*/}}
@@ -183,19 +187,21 @@
                         <h5 class="heading-filter">Product</h5>
 
                         {{/*Product card result*/}}
+                        {{range .Data.Products}}
                         <div class="col-lg-6">
                             <div class="wrap-shoper">
                                 <div class="main-img">
-                                    <img src="images/shoper-img.png" alt="image-shoper">
+                                    <img src="{{printf "%s" .thumbnail}}" alt="image-shoper">
                                 </div>
                                 <div class="main-content">
-                                    <h3 class="heading">V-Neck Blouse</h3>
-                                    <span class="subheading">Zara</span>
-                                    <div class="price">IDR 250,000</div>
+                                    <h3 class="heading">{{ .name }}</h3>
+                                    <span class="subheading">{{ .brand.name }}</span>
+                                    <div class="price">IDR {{ number_format .price 2 "," "." }}</div>
                                     <p class="content"><a href="#">see more</a></p>
                                 </div>
                             </div>
                         </div>
+                        {{end}}
                         {{/*Product card result selesai*/}}
 
                         {{/*Product pagination*/}}
@@ -204,7 +210,7 @@
                                 <a target="3">See More</a>
                             </div>
                             <div class="navigation-box-follow">
-                                <div class="pagination">
+                                <!-- div class="pagination">
                                     <a href="#"><i class="fa fa-arrow-left"></i></a>
                                     <a href="#">1</a>
                                     <a class="active" href="#">2</a>
@@ -214,7 +220,7 @@
                                     <a href="#">...</a>
                                     <a href="#">8</a>
                                     <a href="#"><i class="fa fa-arrow-right"></i></a>
-                                </div>
+                                </div -->
                             </div>
                         </div>
                         {{/*Product pagination selesai*/}}
@@ -233,11 +239,19 @@
             <div class="targetTab-page sponsor-panel" id="tab7">
                 <div class="sponsor-container stickyads">
                     <div class="content-header hidden-sm hidden-xs">Sponsored</div>
+                    {{if eq .Data.Banner.ID 0}}
+                        <div class="sponsors">
+                            <img src="https://theshonet-assets.s3.ap-southeast-1.amazonaws.com/users/Insider-c51ce410c124a10e0db5e4b97fc2af39.jpg" alt="sponsors">
+                            <h4 >THE SHONET</h4>
+                            <!-- p>{{ .Data.Banner.Title }}</p -->
+                        </div>
+                    {{else}}
                     <div class="sponsors">
-                        <img src="assets/zara.jpg" alt="sponsors">
-                        <h4 >Zara</h4>
-                        <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit. Consectetur distinctio optio cum ipsa voluptates ratione unde culpa cupiditate, veniam voluptas adipisci nesciunt dolores, atque reiciendis est labore fugit alias dolore!</p>
+                        <img src="{{printf "%s" .Data.Banner.Banner}}" alt="sponsors">
+                        <h4 >{{ .Data.Banner.Title }}</h4>
+                        <!-- p>{{ .Data.Banner.Title }}</p -->
                     </div>
+                    {{end}}
                 </div>
             </div>
 
@@ -330,68 +344,53 @@
 
             // Actual Code
             $(function() {
-                var data = [
-                    { label: "zara", category: "" },
-                    { label: "zara in post", category: "" },
-                    { label: "zara in insiders", category: "" },
-                    { label: "zara in products", category: "" },
-                    { label: "zara", category: "Products" },
-                    { label: "zara", category: "Products" },
-                    { label: "zara", category: "Products" },
-                    { label: "zara", category: "Insiders" },
-                    { label: "zara", category: "Insiders" },
-                    { label: "zara", category: "Insiders" },
-                    { label: "zara", category: "Post" },
-                    { label: "zara", category: "Post" },
-                    { label: "zara", category: "Post" }
-                ];
 
                 $( "#search" ).catcomplete({
                     delay: 0,
                     source: function (req, resp) {
                         console.log("{{printf "%s/elastic/search?word=" .Data.ApiUrl.url}}" + req.term);
-                        $.ajax({
-                            type: 'GET',
-                            url: "{{printf "%s/elastic/search?word=" .Data.ApiUrl.url}}" + req.term,
-                            headers: {
-                                "Content-Type": "application/json",
-                                "Access-Control-Allow-Headers": 'x-requested-with',
-                                "Access-Control-Allow-Methods": 'GET, POST, OPTIONS',
-                                "Access-Control-Allow-Credentials": 'true',
-                                "Access-Control-Allow-Origin": "*",
-                                "Access-Control-Max-Age": 86400,
-                                "X-Api-Key"   : "{{printf "%s" .Data.ApiUrl.apiKey}}"
-                            },
-                            crossDomain: true,
-                        }).done(function(data) {
-                            resp($.map(data, function (el) {
-                                return {
-                                    label: el.label,
-                                    category: el.category,
-                                    id: el.id
-                                }
-                            }))
-                        })
+                        var request = {
+                            credentials: 'same-origin',
+                            method     : 'GET',
+                            headers    : new Headers({
+                                'X-Api-Key': '{{printf "%s" .Data.ApiUrl.apiKey}}'
+                            })
+                        }
+
+                        var url = '{{printf "%s/elastic/search?word=" .Data.ApiUrl.url}}' + req.term;
+                        fetch(url, request)
+                            .then(response => response.json())
+                            .then(response => {
+                                resp($.map(response, function (el) {
+                                    return {
+                                        label    : el.label,
+                                        category : el.category,
+                                        id       : el.id
+                                    }
+                                }));
+                            })
+                            .catch(err => console.log(err));
                     }
                 });
             });
         });
 
         var test = function() {
-            fetch("https://apidev.theshonet.com/elastic/search?word=zara", {
+            var request = {
                 credentials: 'same-origin',
                 method     : 'GET',
+                mode       : 'cors',
                 headers    : new Headers({
-                    'Content-Type'    : 'application/json',
-                    'Accept'          : 'application/json',
-                    'X-Requested-With': 'XMLHttpRequest',
                     'X-Api-Key': 'sh0N3tAp13L45t1cD3v'
                 })
-            }).then(resp => resp.json())
+            }
+
+            fetch("http://localhost:8081/elastic/search?word=zara", request)
+                .then(resp => resp.json())
                 .then(resp => {
-                    console.log(resp);
+                    console.log(resp)
                 })
-                .catch(err => console.log(err))
+                .catch(err => console.log(err));
         }
 
         test();
