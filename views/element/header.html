@@ -42,11 +42,13 @@
                                                     </a>
                                                 </div>
                                                 <div class="col-sm-5">
-                                                    <form action="/search" role="form">
+                                                    <form action="/search" role="form" id="form-search">
                                                         <div class="form-group">
                                                             <div class="inner-addon left-addon">
                                                                 <i class="fa fa-search"></i>
                                                                 <input name="search" id="search" type="text" class="form-control" placeholder="Search" autocomplete="off" value="{{printf "%s" .Data.Word}}"/>
+                                                                <input type="hidden" id="type" name="type" value=""/>
+                                                                <input type="hidden" id="category" name="category" value=""/>
                                                             </div>
                                                         </div>
                                                     </form>
@@ -70,7 +72,7 @@
 
                                                             </div>
                                                             {{else}}
-                                                            <a id="login-button"><img class="user-profile-img" src="/frontend/images/blog/img-def.svg" onerror="this.src='/frontend/images/blog/img-def.svg';" alt="user-profile-img">
+                                                            <a id="login-button" href="/home"><img class="user-profile-img" src="/frontend/images/blog/img-def.svg" onerror="this.src='/frontend/images/blog/img-def.svg';" alt="user-profile-img">
                                                                 <span style="white-space: nowrap; max-width: 100px; overflow: hidden; text-overflow: ellipsis; display: inline-block; position: relative; top: 4px;">
                                                                     Log In
                                                                 </span>

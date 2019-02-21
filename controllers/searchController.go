@@ -2,9 +2,9 @@ package controllers
 
 import (
 	"encoding/json"
-	"fmt"
 	"github.com/jacky-htg/shonet-frontend/config"
 	"github.com/jacky-htg/shonet-frontend/libraries"
+	"github.com/jacky-htg/shonet-frontend/models"
 	"github.com/jacky-htg/shonet-frontend/repositories"
 	"html/template"
 	"io/ioutil"
@@ -17,18 +17,21 @@ import (
 )
 
 type DataSearchPage struct {
-	Menu 		Menu
-	Auth		interface{}
-	GoogleID 	string
-	OnesignalID string
-	PixelID		string
-	Word		string
-	BaseURL		template.URL
-	ApiUrl		interface{}
-	Articles  []interface{}
-	Products  []interface{}
-	Users     []interface{}
-	Banner      interface{}
+	Menu 		  Menu
+	Auth		  interface{}
+	GoogleID 	  string
+	OnesignalID   string
+	PixelID		  string
+	Word		  string
+	Catex		  string
+	Typex         string
+	BaseURL		  template.URL
+	ApiUrl		  interface{}
+	Articles    []interface{}
+	Products    []interface{}
+	Users       []interface{}
+	Banner        interface{}
+	Categories  []models.Category
 }
 
 var errx     error
@@ -49,7 +52,9 @@ func SearchIndexHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	var api map[string]interface{}
-	var word string
+	var word  string
+	var catx  string
+	var typex string
 
 	api = map[string]interface{}{
 		"apiKey": config.GetString("elasticsearch.apiKey"),
@@ -59,7 +64,10 @@ func SearchIndexHandler(w http.ResponseWriter, r *http.Request) {
 	err = r.ParseForm()
 	if libraries.CheckError(err) {return}
 
-	word = r.FormValue("search")
+	word   = r.FormValue("search")
+	catx   = r.FormValue("category")
+	typex  = r.FormValue("type")
+
 
 	GetUsersDataSearch(r)
 	if libraries.CheckError(errx) {return}
@@ -71,6 +79,9 @@ func SearchIndexHandler(w http.ResponseWriter, r *http.Request) {
 	if libraries.CheckError(errx) {return}
 
 	banner, err := repositories.GetBannerForFront()
+	if libraries.CheckError(err) {return}
+
+	categories, err := repositories.GetCategoryForMenu([]string{"group", "J"})
 	if libraries.CheckError(err) {return}
 
 	data := Page{
@@ -86,15 +97,16 @@ func SearchIndexHandler(w http.ResponseWriter, r *http.Request) {
 			PixelID:		config.GetString("services.facebook.pixel.id"),
 			BaseURL:		template.URL(config.GetString("app.url")),
 			Word:			word,
+			Catex:			catx,
+			Typex:          typex,
 			ApiUrl:			api,
 			Users:          users,
 			Products:       products,
 			Articles:		articles,
 			Banner:         banner,
+			Categories:     categories,
 		},
 	}
-
-	fmt.Println(banner)
 
 	tmpl := template.Must(template.New("main.html").Funcs(template.FuncMap{
 		"strtoupper": func(words string) string {
@@ -129,12 +141,15 @@ func GetUsersDataSearch(r *http.Request) {
 	err := r.ParseForm()
 	if err!=nil {errx = err;return}
 
-	result, err := url.Parse(r.FormValue("search"))
+	search, err := url.Parse(r.FormValue("search"))
+	typex, err  := url.Parse(r.FormValue("type"))
+	catx, err   := url.Parse(r.FormValue("category"))
 	if err!=nil {errx = err;return}
 
 	urlx := config.GetString("elasticsearch.url") +
-		   "/elastic/search/users?word=" +
-		   result.EscapedPath()
+		    "/elastic/search/users?word=" + search.EscapedPath() +
+		    "&type=" + typex.EscapedPath() +
+		    "&category=" + catx.EscapedPath()
 
 	request, err := http.NewRequest("GET", urlx, nil)
 	if err!=nil {errx = err;return}
@@ -158,12 +173,15 @@ func GetProductsDataSearch(r *http.Request) {
 	err := r.ParseForm()
 	if err!=nil {errx=err;return}
 
-	result, err := url.Parse(r.FormValue("search"))
-	if err !=nil {errx=err;return}
+	search, err := url.Parse(r.FormValue("search"))
+	typex, err  := url.Parse(r.FormValue("type"))
+	catx, err   := url.Parse(r.FormValue("category"))
+	if err!=nil {errx = err;return}
 
 	urlx := config.GetString("elasticsearch.url") +
-		    "/elastic/search/products?word=" +
-			result.EscapedPath()
+		    "/elastic/search/products?word=" + search.EscapedPath() +
+			"&type=" + typex.EscapedPath() +
+			"&category=" + catx.EscapedPath()
 
 	request, err := http.NewRequest("GET", urlx, nil)
 	if err!=nil {errx=err;return}
@@ -187,12 +205,15 @@ func GetArticlesDataSearch(r *http.Request) {
 	err := r.ParseForm()
 	if err!=nil {errx=err;return}
 
-	result, err := url.Parse(r.FormValue("search"))
-	if err !=nil {errx=err;return}
+	search, err := url.Parse(r.FormValue("search"))
+	typex, err  := url.Parse(r.FormValue("type"))
+	catx, err   := url.Parse(r.FormValue("category"))
+	if err!=nil {errx = err;return}
 
 	urlx := config.GetString("elasticsearch.url") +
-		    "/elastic/search/articles?word=" +
-		    result.EscapedPath()
+		    "/elastic/search/articles?word=" + search.EscapedPath() +
+			"&type=" + typex.EscapedPath() +
+			"&category=" + catx.EscapedPath()
 
 	request, err := http.NewRequest("GET", urlx, nil)
 	if err!=nil {errx=err;return}

@@ -24,38 +24,45 @@
                 <h5 class="heading-filter"><span>Categories</span></h5>
 
                 <form class="opt-box" action="#">
-                    <input type="radio" id="all" value="all" name="q1" class="form-radio">
-                    <label for="all">All</label>
+                    <input type="radio" id="all" value="all" name="all" class="form-radio">
+                    <label for="all" onclick="document.querySelector('input[name=category]').value=''">All</label>
                     <br>
 
-                    <input type="radio" id="fashion" value="fashion" name="q1" class="form-radio">
-                    <label for="fashion">Fashion</label>
-                    <br>
-
-                    <input type="radio" id="beauty" value="beauty" name="q1" class="form-radio">
-                    <label for="beauty">Beauty</label>
-                    <br>
-
-                    <input type="radio" id="life-style" value="life-style" name="q1" class="form-radio">
-                    <label for="life-style">Life style</label>
-                    <br>
-
-                    <input type="radio" id="list-shonet" value="list-shonet" name="q1" class="form-radio">
-                    <label for="list-shonet">Shonet IT List</label>
+                    {{range .Data.Categories}}
+                        <input type="radio" id="{{printf "%s" .Title}}"
+                               value="{{printf "%s" .Title}}"
+                               name="{{printf "%s" .Title}}"
+                               class="form-radio"
+                               onclick="document.querySelector('input[name=category]').value='{{printf "%s" .Title}}'; document.querySelector('form[id=form-search]').submit(); " />
+                        <label for="{{printf "%s" .Title}}">{{ .Title }}</label>
+                        <br>
+                    {{end}}
                 </form>
 
                 <h5 class="heading-filter"><span>Post Type</span></h5>
 
                 <form class="opt-box" action="#">
-                    <input type="radio" id="all1" value="all1" name="q1" class="form-radio">
+                    <input type="radio" id="all-article"
+                           value="all-article"
+                           name="qA"
+                           class="form-radio"
+                           onclick="document.querySelector('input[name=type]').value=''; document.querySelector('form[id=form-search]').submit();" />
                     <label for="all1">All</label>
                     <br>
 
-                    <input type="radio" id="article" value="article" name="q1" class="form-radio">
+                    <input type="radio" id="article"
+                           value="article"
+                           name="qJ"
+                           class="form-radio"
+                           onclick="document.querySelector('input[name=type]').value='J'; document.querySelector('form[id=form-search]').submit();" />
                     <label for="article">Article</label>
                     <br>
 
-                    <input type="radio" id="mixmatch" value="mixmatch" name="q1" class="form-radio">
+                    <input type="radio" id="mixmatch"
+                           value="mixmatch"
+                           name="qP"
+                           class="form-radio"
+                           onclick="document.querySelector('input[name=type]').value='P'; document.querySelector('form[id=form-search]').submit();" />
                     <label for="mixmatch">Mix & Match</label>
                 </form>
 
@@ -92,6 +99,9 @@
                         <h5 class="heading-filter">Post</h5>
 
                         {{/*post result card mulai*/}}
+                        {{if eq 0 (len .Data.Articles)}}
+                        <div style="text-align: center;color: #7b7a7a;padding: 30px 10px;"><span>Data Posts Not Found</span></div>
+                        {{else}}
                         {{range .Data.Articles}}
                         <div class="wrap-new-post-search">
                             <a class="search-post-img" href="#">
@@ -109,9 +119,11 @@
                             </div>
                         </div>
                         {{end}}
+                        {{end}}
                         {{/*post result card selesai*/}}
 
                         {{/*navigation mulai*/}}
+                        {{if ne 0 (len .Data.Articles)}}
                         <div class="col-md-12 col-sm-12 col-xs-12 text-center">
                             <div class="see-more">
                                 <a target="1">See More</a>
@@ -130,6 +142,7 @@
                                 </div -->
                             </div>
                         </div>
+                        {{end}}
                         {{/*navigation selesai*/}}
 
                     </div>
@@ -143,6 +156,9 @@
                         <h5 class="heading-filter">Insider</h5>
 
                         {{/*Follower insider search*/}}
+                        {{if eq 0 (len .Data.Users)}}
+                        <div style="text-align: center;color: #7b7a7a;padding: 30px 10px;"><span>Data Insiders Not Found</span></div>
+                        {{else}}
                         {{range .Data.Users}}
                         <div class="col-md-4 col-sm-6 col-xs-6">
                             <a href="">
@@ -154,9 +170,11 @@
                             </a>
                         </div>
                         {{end}}
+                        {{end}}
                         {{/*Follower insider search selesai*/}}
 
                         {{/*pagination mulai*/}}
+                        {{if ne 0 (len .Data.Users)}}
                         <div class="col-md-12 col-sm-12 col-xs-12 text-center">
                             <div class="see-more">
                                 <a target="2">See More</a>
@@ -175,6 +193,7 @@
                                 </div -->
                             </div>
                         </div>
+                        {{end}}
                         {{/*pagination selesai*/}}
 
                     </div>
@@ -187,6 +206,9 @@
                         <h5 class="heading-filter">Product</h5>
 
                         {{/*Product card result*/}}
+                        {{if eq 0 (len .Data.Products)}}
+                        <div style="text-align: center;color: #7b7a7a;padding: 30px 10px;"><span>Data Products Not Found</span></div>
+                        {{else}}
                         {{range .Data.Products}}
                         <div class="col-lg-6">
                             <div class="wrap-shoper">
@@ -202,9 +224,11 @@
                             </div>
                         </div>
                         {{end}}
+                        {{end}}
                         {{/*Product card result selesai*/}}
 
                         {{/*Product pagination*/}}
+                        {{if ne 0 (len .Data.Products)}}
                         <div class="col-md-12 col-sm-12 col-xs-12 text-center">
                             <div class="see-more">
                                 <a target="3">See More</a>
@@ -223,6 +247,7 @@
                                 </div -->
                             </div>
                         </div>
+                        {{end}}
                         {{/*Product pagination selesai*/}}
 
                     </div>
@@ -330,12 +355,23 @@
                     $.each( items, function( index, item ) {
                         var li;
                         if ( item.category != currentCategory ) {
-                            ul.append( "<li class='ui-autocomplete-category'>" + item.category + "</li>" );
+                            ul.append( "<li class='ui-autocomplete-category' >" + item.category + "</li>" );
                             currentCategory = item.category;
                         }
                         li = that._renderItemData( ul, item );
                         if ( item.category ) {
                             li.attr( "aria-label", item.category + " : " + item.label );
+                            li.attr( "data-this", item.id );
+                            if (item.hasOwnProperty("slug")) {
+                                li.attr( "data-slug", item.slug );
+                                li.attr( "onclick", "window.location.replace('{{printf "%s" .Uri}}articles/" + item.slug + "');" );
+                            }
+                            if ( item.category === "products" ) {
+                                li.attr( "onclick", "window.location.replace('{{printf "%s" .Uri}}product-detail/" + item.id + "/" + item.label + "');" );
+                            }
+                            if ( item.category === "users" ) {
+                                li.attr( "onclick", "window.location.replace('{{printf "%s" .Uri}}profile/" + item.id + "/" + item.label + "');" );
+                            }
                         }
                     });
                 }
@@ -348,25 +384,29 @@
                 $( "#search" ).catcomplete({
                     delay: 0,
                     source: function (req, resp) {
-                        console.log("{{printf "%s/elastic/search?word=" .Data.ApiUrl.url}}" + req.term);
+                        {{/*console.log("{{printf "%s/elastic/search?word=" .Data.ApiUrl.url}}" + req.term);*/}}
                         var request = {
                             credentials: 'same-origin',
                             method     : 'GET',
                             headers    : new Headers({
                                 'X-Api-Key': '{{printf "%s" .Data.ApiUrl.apiKey}}'
                             })
-                        }
+                        };
 
                         var url = '{{printf "%s/elastic/search?word=" .Data.ApiUrl.url}}' + req.term;
                         fetch(url, request)
                             .then(response => response.json())
                             .then(response => {
                                 resp($.map(response, function (el) {
-                                    return {
-                                        label    : el.label,
-                                        category : el.category,
-                                        id       : el.id
-                                    }
+                                   let x = {};
+
+                                   x.label    = el.label;
+                                   x.category = el.category;
+                                   x.id       = el.id;
+
+                                   if (el.hasOwnProperty("slug")) {x.slug = el.slug}
+
+                                    return x;
                                 }));
                             })
                             .catch(err => console.log(err));
@@ -374,29 +414,15 @@
                 });
             });
         });
-
-        var test = function() {
-            var request = {
-                credentials: 'same-origin',
-                method     : 'GET',
-                mode       : 'cors',
-                headers    : new Headers({
-                    'X-Api-Key': 'sh0N3tAp13L45t1cD3v'
-                })
-            }
-
-            fetch("http://localhost:8081/elastic/search?word=zara", request)
-                .then(resp => resp.json())
-                .then(resp => {
-                    console.log(resp)
-                })
-                .catch(err => console.log(err));
-        }
-
-        test();
     </script>
 
     <script type="text/javascript">
+        var catx  = "{{printf "%s" .Data.Catex}}";
+        var typex = "{{printf "%s" .Data.Typex}}";
+
+        if (typex !== "") {document.querySelector(`input[name=q${typex}]`).checked=true;} else {document.querySelector(`input[name=qA]`).checked=true;}
+        if (catx  !== "") {document.querySelector(`input[name='${catx}']`).checked=true;} else {document.querySelector(`input[name=all]`).checked=true;}
+
         $( document ).ready(function() {
             var $stickyads = $('.stickyads');
             var $owlprev = $('.owl-prev');

@@ -29,7 +29,7 @@ func HomeIndexHandler(w http.ResponseWriter, r *http.Request) {
 		},
 	}
 
-	tmpl := template.Must(template.ParseFiles("views/layout/main.tpl", "views/element/title.tpl", "views/home/home.tpl"))
+	tmpl := template.Must(template.ParseFiles("views/layout/main.html", "views/element/title.html", "views/home/home.tpl"))
 	tmpl.Execute(w, data)
 }
 
