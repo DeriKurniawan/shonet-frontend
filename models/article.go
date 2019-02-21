@@ -41,6 +41,8 @@ type ArticleNull struct {
 	CreatedAt           mysql.NullTime
 	UpdatedAt           mysql.NullTime
 	ContentManipulation sql.NullString
+	WriterID			sql.NullInt64
+	EditorID			sql.NullInt64
 }
 
 type ArticleElastic struct {

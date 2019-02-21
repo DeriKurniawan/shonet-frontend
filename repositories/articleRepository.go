@@ -154,8 +154,8 @@ func fetchArticles(rows *sql.Rows, err error) ([]models.Article, error) {
 				&article.Status,
 				&articleNull.RequestPublishDate,
 				&articleNull.PublishDate,
-				&article.Writer.ID,
-				&article.Editor.ID,
+				&articleNull.WriterID,
+				&articleNull.EditorID,
 				&articleNull.CreatedAt,
 				&articleNull.UpdatedAt,
 				&articleNull.TrendingCount,
@@ -172,6 +172,8 @@ func fetchArticles(rows *sql.Rows, err error) ([]models.Article, error) {
 		article.SeoKeyword = articleNull.SeoKeyword.String
 		article.RequestPublishDate = articleNull.RequestPublishDate.Time
 		article.PublishDate = articleNull.PublishDate.Time
+		article.Writer.ID = uint(articleNull.WriterID.Int64)
+		article.Editor.ID = uint(articleNull.EditorID.Int64)
 		article.CreatedAt = articleNull.CreatedAt.Time
 		article.UpdateAt = articleNull.UpdatedAt.Time
 		article.TrendingCount = uint(articleNull.TrendingCount.Int64)
