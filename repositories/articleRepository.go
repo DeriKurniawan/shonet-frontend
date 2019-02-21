@@ -22,7 +22,8 @@ func GetArticlesById(ids []uint) ([]models.Article, error) {
 }
 
 func GetOneArticleById(id uint) (models.Article, error) {
-	sql := "SELECT * FROM `articles` WHERE `articles`.`id` = " + string(id) + " AND `articles`.`status` = 'P'"
+	sql := " SELECT `id`, `title`, `slug`, `permalink`, `content`, `image`, `image_source`, `seo_keyword`, `type`, `status`, `request_publish_date`, `publish_date`, `writer`, `editor`, `created_at`, `updated_at`, `trending_count`, `content_manipulation` " +
+		   " FROM `articles` WHERE `articles`.`id` = " + string(id) + " AND `articles`.`status` = 'P'"
 	articles, err := fetchArticles(db.Query(sql))
 	if err != nil {
 		return models.Article{}, err
