@@ -40,7 +40,7 @@ func GetHotArticles() (HotArticlesMenu, error) {
 	limitOrder := 4
 	curLimit   := 0
 
-	hotArticleSql = " SELECT * FROM `hot_articles` WHERE (`start_date` <= NOW() AND `end_date` >= NOW()) AND EXISTS(" +
+	hotArticleSql = " SELECT `id`, `start_date`, `end_date`, `created_at`, `updated_at` FROM `hot_articles` WHERE (`start_date` <= NOW() AND `end_date` >= NOW()) AND EXISTS(" +
 				 	" SELECT * FROM `articles` WHERE `hot_articles`.`article_id` = `articles`.`id` AND (" +
 				 	" `articles`.`status` = 'P' AND `articles`.`publish_date` <= NOW() " +
 				 	" )" +
@@ -64,8 +64,9 @@ func GetHotArticles() (HotArticlesMenu, error) {
 		whereNotIn = append(whereNotIn, strconv.Itoa(0))
 	}
 
-	articleSql   := " SELECT * FROM `articles` WHERE `articles`.`id` NOT IN (" +
-					  strings.Join(whereNotIn, ", ")+
+	articleSql   := " SELECT `id`, `title`, `slug`, `permalink`, `content`, `image`, `image_source`, `seo_keyword`, `type`, `status`, `request_publish_date`, `publish_date`, `writer`, `editor`, `created_at`, `updated_at`, `trending_count`, `content_manipulation` " +
+		            " FROM `articles` WHERE `articles`.`id` NOT IN (" +
+		            " " + strings.Join(whereNotIn, ", ")+
 					" ) ORDER BY `articles`.`trending_count`, `articles`.`publish_date` DESC LIMIT " +(strconv.Itoa(limitOrder - curLimit))
 
 	if curLimit < limitOrder {

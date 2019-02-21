@@ -13,7 +13,8 @@ func GetTopProduct(flag uint) (TopProductMenu, error) {
 	var curLimit = 0
 	var whereNotIn = []string{}
 
-	sqlWords := " SELECT * FROM `products` WHERE `products`.`top_product` != 0 AND `products`.`category_id` IN ( " +
+	sqlWords := " SELECT `id`, `name`, `brand_id`, `category_id`, `thumbnail`, `description`, `price`, `site_url`, `must_have`, `top_product`, `created_by`, `created_at`, `updated_at`, `view`, `click` " +
+		        " FROM `products` WHERE `products`.`top_product` != 0 AND `products`.`category_id` IN ( " +
 		   		" SELECT `categories`.`id` FROM `categories` WHERE `categories`.`parent_id` = " +strconv.Itoa(int(flag))+
 		   		" ) ORDER BY `products`.`name` DESC LIMIT " +strconv.Itoa(oriLimit)
 
@@ -31,7 +32,8 @@ func GetTopProduct(flag uint) (TopProductMenu, error) {
 	}
 
 	if curLimit < oriLimit {
-		sqlWords = " SELECT * FROM `products` WHERE `products`.`id` NOT IN ( " +
+		sqlWords = " SELECT `id`, `name`, `brand_id`, `category_id`, `thumbnail`, `description`, `price`, `site_url`, `must_have`, `top_product`, `created_by`, `created_at`, `updated_at`, `view`, `click` " +
+			       " FROM `products` WHERE `products`.`id` NOT IN ( " +
 				   " " +strings.Join(whereNotIn, ", ")+ " ) " +
 				   " AND `products`.`category_id` IN ( " +
 				   " SELECT `id` FROM `categories` WHERE `categories`.`parent_id` = " +strconv.Itoa(int(flag))+
