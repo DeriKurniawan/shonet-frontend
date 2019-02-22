@@ -2,7 +2,7 @@ package repositories
 
 import (
 	"database/sql"
-	"github.com/jacky-htg/shonet-frontend/libraries"
+	"errors"
 	"github.com/jacky-htg/shonet-frontend/models"
 )
 
@@ -16,9 +16,9 @@ func GetUserByID (id uint) (models.User, error) {
 func getUserRow(rows *sql.Rows, err error) (models.User, error) {
 
 	var user models.User
-	libraries.CheckError(err)
 
 	if err != nil {
+		err = errors.New(" Error @userRespository:getUserRow #db.Query :: " + err.Error())
 		return models.User{}, err
 	}
 
@@ -45,6 +45,7 @@ func getUserRow(rows *sql.Rows, err error) (models.User, error) {
 			)
 
 		if err != nil {
+			err = errors.New(" Error @userRespository:getUserRow #rows.Scan :: " + err.Error())
 			return models.User{}, err
 		}
 
@@ -60,6 +61,7 @@ func getUserRow(rows *sql.Rows, err error) (models.User, error) {
 
 	err = rows.Err()
 	if err != nil {
+		err = errors.New(" Error @userRespository:getUserRow #rows.Err() :: " + err.Error())
 		return models.User{}, err
 	}
 

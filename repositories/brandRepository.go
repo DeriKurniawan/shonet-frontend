@@ -2,6 +2,7 @@ package repositories
 
 import (
 	"database/sql"
+	"errors"
 	"github.com/jacky-htg/shonet-frontend/models"
 	"strconv"
 	"strings"
@@ -19,6 +20,7 @@ func GetTopBrands(flag int) ([]models.Brand, error) {
 
 	brands, err := fetchBrands(db.Query(sql))
 	if err != nil {
+		err = errors.New(" Error @brandRepository:GetTopBrands #fetchBrands#db.Query :: " + err.Error())
 		return []models.Brand{}, err
 	}
 
@@ -46,6 +48,7 @@ func GetTopBrands(flag int) ([]models.Brand, error) {
 		sql = " SELECT * FROM `brands` WHERE `brands`.`id` NOT IN ( " +strings.Join(whereNotIn, ", ")+ " ) ORDER BY `brands`.`name` ASC LIMIT " +strconv.Itoa(oriLimit - curLimit)
 		brands1, err := fetchBrands(db.Query(sql))
 		if err != nil {
+			err = errors.New(" Error @brandRepository:GetTopBrands #fetchBrands#db.Query#2 :: " + err.Error())
 			return []models.Brand{}, err
 		}
 
@@ -59,6 +62,7 @@ func fetchBrands(rows *sql.Rows, err error) ([]models.Brand, error) {
 	var brands []models.Brand
 
 	if err != nil {
+		err = errors.New(" Error @brandRepository:fetchBrands #db.Query :: " + err.Error())
 		return []models.Brand{}, err
 	}
 
@@ -85,6 +89,7 @@ func fetchBrands(rows *sql.Rows, err error) ([]models.Brand, error) {
 			)
 
 		if err != nil {
+			err = errors.New(" Error @brandRepository:fetchBrands #rows.Scan :: " + err.Error())
 			return []models.Brand{}, err
 		}
 
@@ -103,6 +108,7 @@ func fetchBrands(rows *sql.Rows, err error) ([]models.Brand, error) {
 	}
 
 	if err = rows.Err(); err != nil {
+		err = errors.New(" Error @brandRepository:fetchBrands #rows.Err() :: " + err.Error())
 		return []models.Brand{}, err
 	}
 

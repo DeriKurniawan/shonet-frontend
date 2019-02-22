@@ -1,6 +1,9 @@
 package repositories
 
-import "github.com/jacky-htg/shonet-frontend/models"
+import (
+	"errors"
+	"github.com/jacky-htg/shonet-frontend/models"
+)
 
 func GetBannerForFront() (models.Banner, error) {
 	sqlWord := "SELECT * FROM `banners` WHERE `banners`.`page` = 'profile' AND `banners`.`start_date` <= NOW() AND `banners`.`end_date` >= NOW() LIMIT 1"
@@ -8,7 +11,10 @@ func GetBannerForFront() (models.Banner, error) {
 	var bannerNull models.BannerNull
 
 	rows, err := db.Query(sqlWord)
-	if err != nil {return banner, err}
+	if err != nil {
+		err = errors.New("Error @bannerRepository:GetBannerForFront #db.Query :: " + err.Error())
+		return banner, err
+	}
 
 	defer rows.Close()
 
@@ -25,7 +31,10 @@ func GetBannerForFront() (models.Banner, error) {
 				&bannerNull.UpdatedAt,
 			)
 
-		if err != nil {return banner, err}
+		if err != nil {
+			err = errors.New("Error @bannerRepository:GetBannerForFront #rows.Scan :: " + err.Error())
+			return banner, err
+		}
 
 		banner.Url =bannerNull.Url.String
 		banner.EndDate = bannerNull.EndDate.Time
@@ -34,6 +43,7 @@ func GetBannerForFront() (models.Banner, error) {
 	}
 
 	if err = rows.Err(); err !=nil {
+		err = errors.New("Error @bannerRepository:GetBannerForFront #rows.Err() :: " + err.Error())
 		return banner, err
 	}
 

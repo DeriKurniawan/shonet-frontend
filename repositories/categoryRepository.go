@@ -2,6 +2,7 @@ package repositories
 
 import (
 	"database/sql"
+	"errors"
 	"github.com/jacky-htg/shonet-frontend/models"
 )
 
@@ -15,6 +16,7 @@ func fetchCategories(rows *sql.Rows, err error) ([]models.Category, error) {
 	var categories []models.Category
 
 	if err != nil {
+		err = errors.New(" Error @categoryRepository:fetchCategories #db.Query :: " + err.Error())
 		return []models.Category{}, err
 	}
 
@@ -35,6 +37,7 @@ func fetchCategories(rows *sql.Rows, err error) ([]models.Category, error) {
 			)
 
 		if err != nil {
+			err = errors.New(" Error @categoryRepository:fetchCategories #rows.Scan :: " + err.Error())
 			return []models.Category{}, err
 		}
 
@@ -47,6 +50,7 @@ func fetchCategories(rows *sql.Rows, err error) ([]models.Category, error) {
 	}
 
 	if err = rows.Err(); err != nil {
+		err = errors.New(" Error @categoryRepository:fetchCategories #rows.Err() :: " + err.Error())
 		return []models.Category{}, err
 	}
 

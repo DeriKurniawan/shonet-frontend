@@ -2,6 +2,7 @@ package repositories
 
 import (
 	"database/sql"
+	"errors"
 	"github.com/jacky-htg/shonet-frontend/libraries"
 	"github.com/jacky-htg/shonet-frontend/models"
 	"strconv"
@@ -15,6 +16,7 @@ func GetArticlesById(ids []uint) ([]models.Article, error) {
 	sql := "SELECT * FROM `articles` WHERE `articles`.`id` IN (" +strings.Join(idString, ", ")+ " ORDER BY `articles`.`publish_date` DESC"
 	articles, err := fetchArticles(db.Query(sql))
 	if err != nil {
+		err = errors.New("Error @articleRepository:GetArticlesById #db.Query :: " + err.Error())
 		return []models.Article{}, err
 	}
 
@@ -26,6 +28,7 @@ func GetOneArticleById(id uint) (models.Article, error) {
 		   " FROM `articles` WHERE `articles`.`id` = " + string(id) + " AND `articles`.`status` = 'P'"
 	articles, err := fetchArticles(db.Query(sql))
 	if err != nil {
+		err = errors.New("Error @articleRepository:GetArticleById #db.Query :: " + err.Error())
 		return models.Article{}, err
 	}
 
@@ -50,6 +53,7 @@ func GetHotArticles() (HotArticlesMenu, error) {
 
 	hotArticles, err := fetchHotArticles(db.Query(hotArticleSql))
 	if err != nil {
+		err = errors.New("Error @articleRepository:GetHotArticles #fetchHotArticles :: " + err.Error())
 		return HotArticlesMenu{}, err
 	}
 
@@ -73,6 +77,7 @@ func GetHotArticles() (HotArticlesMenu, error) {
 	if curLimit < limitOrder {
 		articles, err := fetchArticles(db.Query(articleSql))
 		if err != nil {
+			err = errors.New("Error @articleRepository:GetHotArticles #fetchArticles :: " + err.Error())
 			return HotArticlesMenu{}, err
 		}
 
@@ -87,6 +92,7 @@ func fetchHotArticles(row *sql.Rows, err error) ([]models.HotArticle, error) {
 
 	libraries.CheckError(err)
 	if err != nil {
+		err = errors.New("Error @articleRepository:fetchHotArticles #db.Query :: " + err.Error())
 		return []models.HotArticle{}, err
 	}
 
@@ -106,6 +112,7 @@ func fetchHotArticles(row *sql.Rows, err error) ([]models.HotArticle, error) {
 			)
 
 		if err != nil {
+			err = errors.New("Error @articleRepository:fetchHotArticles #row.Scan :: " + err.Error())
 			return []models.HotArticle{}, err
 		}
 
@@ -121,6 +128,7 @@ func fetchHotArticles(row *sql.Rows, err error) ([]models.HotArticle, error) {
 	}
 
 	if err = row.Err(); err != nil {
+		err = errors.New("Error @articleRepository:fetchHotArticles #row.Err() :: " + err.Error())
 		return []models.HotArticle{}, err
 	}
 
@@ -130,8 +138,8 @@ func fetchHotArticles(row *sql.Rows, err error) ([]models.HotArticle, error) {
 func fetchArticles(rows *sql.Rows, err error) ([]models.Article, error) {
 	var articles []models.Article
 
-	libraries.CheckError(err)
 	if err != nil {
+		err = errors.New("Error @articleRepository:fetchArticles #db.Query :: " + err.Error())
 		return []models.Article{}, err
 	}
 
@@ -163,6 +171,7 @@ func fetchArticles(rows *sql.Rows, err error) ([]models.Article, error) {
 			)
 
 		if err != nil {
+			err = errors.New("Error @articleRepository:fetchArticles #rows.Scan :: " + err.Error())
 			return []models.Article{}, err
 		}
 
@@ -183,6 +192,7 @@ func fetchArticles(rows *sql.Rows, err error) ([]models.Article, error) {
 	}
 
 	if err = rows.Err(); err != nil {
+		err = errors.New("Error @articleRepository:fetchArticles #rows.Err() :: " + err.Error())
 		return []models.Article{}, nil
 	}
 

@@ -27,7 +27,8 @@ func GetSessionLaravel(cookie, key string) (string, error) {
 
 	decodeBytes, err := base64.StdEncoding.DecodeString(cookie)
 	if err != nil {
-		return "", errors.New("cookie value must on base64 format")
+		err = errors.New("cookie value must on base64 format : " + err.Error())
+		return "", err
 	}
 
 	payload := Payload{}
@@ -60,6 +61,7 @@ func GetSessionLaravel(cookie, key string) (string, error) {
 
 	block, err := aes.NewCipher(keyBytes)
 	if err != nil {
+		err = errors.New(" Error @sessionController.go:GetSessionLaravel #aes.NewCipher#keyBytes :: " + err.Error())
 		return "", err
 	}
 
@@ -89,6 +91,7 @@ func parseSessionData(data string) (php_serialize.PhpArray, error) {
 	sessionDataDecoded, err := decoder.Decode()
 
 	if err != nil {
+		err = errors.New(" Error @sessionController.go:ParseSessionData #php_serialize.NewUnSerializer#data :: " + err.Error())
 		return nil, err
 	}
 
@@ -105,26 +108,31 @@ func GetUserClient(r *http.Request) (models.User, error) {
 	user := models.User{}
 	cook, err := r.Cookie(config.GetString("laravel.sessionName"))
 	if err != nil {
+		err = errors.New(" Error @sessionController.go:GetUserClient #r.Cookie#laravel.sessionName :: " + err.Error())
 		return models.User{}, err
 	}
 
 	cookie, err := url.QueryUnescape(cook.Value)
 	if err != nil {
+		err = errors.New(" Error @sessionController.go:GetUserClient #url.QueryUnescape#cook.Value :: " + err.Error())
 		return models.User{}, err
 	}
 
 	sessionID, err := GetSessionLaravel(cookie, config.GetString("laravel.appKey"))
 	if err != nil {
+		err = errors.New(" Error @sessionController.go:GetUserClient #sessionID#GetSessionLaravel :: " + err.Error())
 		return models.User{}, err
 	}
 
 	keySession, err := libraries.RedisGet(sessionID)
 	if err != nil {
+		err = errors.New(" Error @sessionController.go:GetUserClient #keySession#libraries.RedisGet :: " + err.Error())
 		return models.User{}, err
 	}
 
 	sessionParse, err := parseSessionData(string(keySession))
 	if err != nil {
+		err = errors.New(" Error @sessionController.go:GetUserClient #sessionParsen#parseSessionData :: " + err.Error())
 		return models.User{}, err
 	}
 
@@ -143,6 +151,7 @@ func GetUserClient(r *http.Request) (models.User, error) {
 	if userID > 0 {
 		user, err = repositories.GetUserByID(uint(userID))
 		if err != nil {
+			err = errors.New(" Error @sessionController.go:GetUserClient #repositories.GetUserByID#uint(userID) :: " + err.Error())
 			return models.User{}, err
 		}
 	}

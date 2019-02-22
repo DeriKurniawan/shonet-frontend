@@ -2,6 +2,7 @@ package repositories
 
 import (
 	"database/sql"
+	"errors"
 	"github.com/jacky-htg/shonet-frontend/models"
 	"strconv"
 	"strings"
@@ -20,6 +21,7 @@ func GetTopProduct(flag uint) (TopProductMenu, error) {
 
 	products, err := fetchProducts(db.Query(sqlWords))
 	if err != nil {
+		err = errors.New(" Error @productRepository:GetTopProduct #fetchProducts#db.Query :: " + err.Error())
 		return TopProductMenu{}, err
 	}
 
@@ -41,6 +43,7 @@ func GetTopProduct(flag uint) (TopProductMenu, error) {
 
 		products, err = fetchProducts(db.Query(sqlWords))
 		if err != nil {
+			err = errors.New(" Error @productRepository:GetTopProduct #fetchProducts#db.Query#2 :: " + err.Error())
 			return TopProductMenu{}, err
 		}
 
@@ -54,6 +57,7 @@ func fetchProducts(rows *sql.Rows, err error) ([]models.Product, error) {
 	var products []models.Product
 
 	if err != nil {
+		err = errors.New(" Error @productRepository:fetchProducts #db.Query :: " + err.Error())
 		return []models.Product{}, err
 	}
 
@@ -82,6 +86,7 @@ func fetchProducts(rows *sql.Rows, err error) ([]models.Product, error) {
 			)
 
 		if err != nil {
+			err = errors.New(" Error @productRepository:fetchProducts #rows.Scan :: " + err.Error())
 			return []models.Product{}, err
 		}
 
@@ -95,6 +100,7 @@ func fetchProducts(rows *sql.Rows, err error) ([]models.Product, error) {
 	}
 
 	if err = rows.Err(); err != nil {
+		err = errors.New(" Error @productRepository:fetchProducts #rows.Err() :: " + err.Error())
 		return []models.Product{}, err
 	}
 

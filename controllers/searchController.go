@@ -6,6 +6,7 @@ import (
 	"github.com/jacky-htg/shonet-frontend/libraries"
 	"github.com/jacky-htg/shonet-frontend/models"
 	"github.com/jacky-htg/shonet-frontend/repositories"
+	"github.com/pkg/errors"
 	"html/template"
 	"io/ioutil"
 	"log"
@@ -139,12 +140,20 @@ func SearchIndexHandler(w http.ResponseWriter, r *http.Request) {
 
 func GetUsersDataSearch(r *http.Request) {
 	err := r.ParseForm()
-	if err!=nil {errx = err;return}
+	if err!=nil {
+		err = errors.New(" Error @searchController:GetUsersDataSearch #ParseForm :: " + err.Error())
+		errx = err
+		return
+	}
 
 	search, err := url.Parse(r.FormValue("search"))
 	typex, err  := url.Parse(r.FormValue("type"))
 	catx, err   := url.Parse(r.FormValue("category"))
-	if err!=nil {errx = err;return}
+	if err!=nil {
+		err = errors.New(" Error @searchController:GetUsersDataSearch #url.Parse#r.FormValue :: " + err.Error())
+		errx = err
+		return
+	}
 
 	urlx := config.GetString("elasticsearch.url") +
 		    "/elastic/search/users?word=" + search.EscapedPath() +
@@ -152,31 +161,55 @@ func GetUsersDataSearch(r *http.Request) {
 		    "&category=" + catx.EscapedPath()
 
 	request, err := http.NewRequest("GET", urlx, nil)
-	if err!=nil {errx = err;return}
+	if err!=nil {
+		err = errors.New(" Error @searchController:GetUsersDataSearch #request#http.NewRequest :: " + err.Error())
+		errx = err
+		return
+	}
 
 	request.Header.Set("X-Api-Key", config.GetString("elasticsearch.apiKey"))
 
 	client := http.Client{}
 	response, err := client.Do(request)
-	if err!=nil {errx = err;return}
+	if err!=nil {
+		err = errors.New(" Error @searchController:GetUsersDataSearch #response#client.Do(request) :: " + err.Error())
+		errx = err
+		return
+	}
 
 	defer response.Body.Close()
 
 	body, err := ioutil.ReadAll(response.Body)
-	if err!=nil {errx=err;return}
+	if err!=nil {
+		err = errors.New(" Error @searchController:GetUsersDataSearch #ioutil.ReadAll#response.Body :: " + err.Error())
+		errx = err
+		return
+	}
 
 	err = json.Unmarshal(body, &users)
-	if err!=nil {errx=err;return}
+	if err!=nil {
+		err = errors.New(" Error @searchController:GetUsersDataSearch #json.Unmarshal#&user :: " + err.Error())
+		errx = err
+		return
+	}
 }
 
 func GetProductsDataSearch(r *http.Request) {
 	err := r.ParseForm()
-	if err!=nil {errx=err;return}
+	if err!=nil {
+		err = errors.New(" Error @searchController:GetProductsDataSearch #r.ParseForm :: " + err.Error())
+		errx = err
+		return
+	}
 
 	search, err := url.Parse(r.FormValue("search"))
 	typex, err  := url.Parse(r.FormValue("type"))
 	catx, err   := url.Parse(r.FormValue("category"))
-	if err!=nil {errx = err;return}
+	if err!=nil {
+		err = errors.New(" Error @searchController:GetProductsDataSearch #url.Parse#r.FormValue :: " + err.Error())
+		errx = err
+		return
+	}
 
 	urlx := config.GetString("elasticsearch.url") +
 		    "/elastic/search/products?word=" + search.EscapedPath() +
@@ -184,31 +217,55 @@ func GetProductsDataSearch(r *http.Request) {
 			"&category=" + catx.EscapedPath()
 
 	request, err := http.NewRequest("GET", urlx, nil)
-	if err!=nil {errx=err;return}
+	if err!=nil {
+		err = errors.New(" Error @searchController:GetProductsDataSearch #url.Parse#r.FormValue :: " + err.Error())
+		errx = err
+		return
+	}
 
 	request.Header.Set("X-Api-Key", config.GetString("elasticsearch.apiKey"))
 
 	client := http.Client{}
 	response, err := client.Do(request)
-	if err!=nil {errx=err;return}
+	if err!=nil {
+		err = errors.New(" Error @searchController:GetProductsDataSearch #response#client.Do(request) :: " + err.Error())
+		errx = err
+		return
+	}
 
 	defer response.Body.Close()
 
 	body, err := ioutil.ReadAll(response.Body)
-	if err!=nil {errx=err;return}
+	if err!=nil {
+		err = errors.New(" Error @searchController:GetProductsDataSearch #ioutil.ReadAll#response.Body :: " + err.Error())
+		errx = err
+		return
+	}
 
 	err = json.Unmarshal(body, &products)
-	if err!=nil {errx=err;return}
+	if err!=nil {
+		err = errors.New(" Error @searchController:GetProductsDataSearch #json.Unmarshal#&user :: " + err.Error())
+		errx = err
+		return
+	}
 }
 
 func GetArticlesDataSearch(r *http.Request) {
 	err := r.ParseForm()
-	if err!=nil {errx=err;return}
+	if err!=nil {
+		err = errors.New(" Error @searchController:GetArticlesDataSearch #r.ParseForm :: " + err.Error())
+		errx = err
+		return
+	}
 
 	search, err := url.Parse(r.FormValue("search"))
 	typex, err  := url.Parse(r.FormValue("type"))
 	catx, err   := url.Parse(r.FormValue("category"))
-	if err!=nil {errx = err;return}
+	if err!=nil {
+		err = errors.New(" Error @searchController:GetArticlesDataSearch #url.Parse#r.FormValue :: " + err.Error())
+		errx = err
+		return
+	}
 
 	urlx := config.GetString("elasticsearch.url") +
 		    "/elastic/search/articles?word=" + search.EscapedPath() +
@@ -216,19 +273,35 @@ func GetArticlesDataSearch(r *http.Request) {
 			"&category=" + catx.EscapedPath()
 
 	request, err := http.NewRequest("GET", urlx, nil)
-	if err!=nil {errx=err;return}
+	if err!=nil {
+		err = errors.New(" Error @searchController:GetArticlesDataSearch #url.Parse#r.FormValue :: " + err.Error())
+		errx = err
+		return
+	}
 
 	request.Header.Set("X-Api-Key", config.GetString("elasticsearch.apiKey"))
 
 	client := http.Client{}
 	response, err := client.Do(request)
-	if err!=nil {errx=err;return}
+	if err!=nil {
+		err = errors.New(" Error @searchController:GetArticlesDataSearch #response#client.Do(request) :: " + err.Error())
+		errx = err
+		return
+	}
 
 	defer response.Body.Close()
 
 	body, err := ioutil.ReadAll(response.Body)
-	if err!=nil {errx=err;return}
+	if err!=nil {
+		err = errors.New(" Error @searchController:GetArticlesDataSearch #ioutil.ReadAll#response.Body :: " + err.Error())
+		errx = err
+		return
+	}
 
 	err = json.Unmarshal(body, &articles)
-	if err!=nil {errx=err;return}
+	if err!=nil {
+		err = errors.New(" Error @searchController:GetArticlesDataSearch #json.Unmarshal#&user :: " + err.Error())
+		errx = err
+		return
+	}
 }
